@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/welcome_page_second"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        tools:context=".WelcomeSecondFragment">
+
+         <TextView
+            android:layout_width="350dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/round_box"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:textColor="@color/textColor"
+            android:lineSpacingExtra="10dp"
+            android:text="아래 마이크 권한을 꼭 허용 해주세요. \n 아래 마이크 작동 여부가 표시됩니다."></TextView>
+
+    <!--    1. 마이크 체킹 -->
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:gravity="center">-->
+
+            <LinearLayout
+                android:id="@+id/checking_mic"
+                android:layout_width="@dimen/box_width"
+                android:layout_height="300dp"
+                android:orientation="vertical"
+                android:background="@drawable/round_box"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="@dimen/box_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:textColor="@color/textColor"
+                    android:lineSpacingExtra="10dp"
+                    android:text="마이크 연결 확인 중...\n(클릭시 테스트)" />
+                <ProgressBar
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"/>
+            </LinearLayout>
+
+        <!--    2. 마이크 연결 완료-->
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/connected_mic"
+                android:layout_width="@dimen/box_width"
+                android:layout_height="300dp"
+                android:orientation="vertical"
+                android:background="@drawable/round_box"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="@dimen/box_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:textColor="@color/textColor"
+                    android:lineSpacingExtra="10dp"
+                    android:text="마이크가 연결되었습니다." />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FF0000"
+                    android:textSize="30dp"
+                    android:gravity="center"
+                    android:text="✔"/>
+            </LinearLayout>
+
+        <!--    3. 마이크 연결 안됨-->
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/disconnected_mic"
+                android:layout_width="@dimen/box_width"
+                android:layout_height="300dp"
+                android:orientation="vertical"
+                android:background="@drawable/round_box"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="@dimen/box_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:textColor="@color/textColor"
+                    android:lineSpacingExtra="10dp"
+                    android:text="마이크가 연결되지 않았습니다." />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="❌"
+                    android:textSize="30dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+<!--    </LinearLayout>-->
+
+    <Button
+        android:id="@+id/btnPrev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="40dp"
+        android:text="← 이전"
+        android:textSize="20dp"
+        android:background="@drawable/round_button"/>
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp"
+        android:text="다음 →"
+        android:textSize="20dp"
+        android:background="@drawable/round_button"/>
+</RelativeLayout>

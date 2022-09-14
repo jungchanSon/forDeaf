@@ -1,27 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SecondFragment">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center">
 
-    <TextView
-        android:id="@+id/textview_second"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/button_second"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/welcome_page_second"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        tools:context=".WelcomeSecondFragment">
 
+        <TextView
+
+            android:layout_width="350dp"
+            android:layout_height="200dp"
+            android:background="@drawable/round_box"
+            android:gravity="center"
+            android:lineSpacingExtra="10dp"
+            android:text="@string/introduce"
+            android:textColor="@color/textColor"
+            android:textSize="20dp"></TextView>
+
+        <TextView
+            android:layout_width="350dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/round_box"
+            android:gravity="center"
+            android:lineSpacingExtra="10dp"
+            android:text="@string/how_to_use"
+            android:textColor="@color/textColor"
+            android:textSize="20dp"></TextView>
+    </LinearLayout>
     <Button
-        android:id="@+id/button_second"
+        android:id="@+id/btnNext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/previous"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_second" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp"
+        android:text="다음 →"
+        android:textSize="20dp"
+        android:background="@drawable/round_button"/>
+</RelativeLayout>

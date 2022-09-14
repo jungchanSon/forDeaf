@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.myapplication">
 
+    <!--    권한 목록-->
+    <uses-permission android:name = "android.permission.VIBRATE" />
+    <uses-permission android:name = "android.permission.RECORD_AUDIO" />
+    <!--    권한 목록-->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

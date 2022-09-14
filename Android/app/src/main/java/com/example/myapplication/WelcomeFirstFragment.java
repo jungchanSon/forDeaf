@@ -9,11 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.myapplication.databinding.WelcomePageSecondBinding;
+import com.example.myapplication.databinding.WelcomePageFirstBinding;
 
-public class SecondFragment extends Fragment {
+public class WelcomeFirstFragment extends Fragment {
 
-    private WelcomePageSecondBinding binding;
+    private WelcomePageFirstBinding binding;
 
     @Override
     public View onCreateView(
@@ -21,7 +21,7 @@ public class SecondFragment extends Fragment {
             Bundle savedInstanceState
     ) {
 
-        binding = WelcomePageSecondBinding.inflate(inflater, container, false);
+        binding = WelcomePageFirstBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
     }
@@ -29,11 +29,11 @@ public class SecondFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
+        binding.welcomePage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(SecondFragment.this)
-                        .navigate(R.id.action_SecondFragment_to_FirstFragment);
+                NavHostFragment.findNavController(WelcomeFirstFragment.this)
+                        .navigate(R.id.action_WelcomePageFirst_to_WelcomePageSecond);
             }
         });
     }

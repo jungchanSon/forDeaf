@@ -1,12 +1,23 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="action_settings">Settings</string>
+
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+<!--    네이게이션 라벨들-->
+    <string name="welcome_page_first_label">안녕하세요 </string>
+    <string name="welcome_page_second_label">소개와 사용법</string>
+    <string name="sound_check_page_label">마이크 체크</string>
+    <string name="analysis_sound_page_label">소리 분석</string>
+<!--    네이게이션 라벨들-->
+
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+<!--    WelcomePage_second 텍스트-->
+    <string name="introduce">청각장애인을 위해 주변 차량소리들을 \n 대신 듣고, 경고해줍니다.</string>
+    <string name="how_to_use">1. 마이크 권한을 수락해주세요.\n
+    2. 다음 화면에서 소리가 전달되는 지 체크해주세요.\n
+    3. 기능을 작동시키고, 진동을 전달 받을 수 있게 휴대하세요.</string>
+
 </resources>

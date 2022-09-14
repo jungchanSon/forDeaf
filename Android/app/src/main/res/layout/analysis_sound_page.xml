@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center">
+
+    <LinearLayout
+        android:id="@+id/analysisTextBox"
+        android:layout_width="350dp"
+        android:layout_height="300dp"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"
+        android:background="@drawable/round_box"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="소리를 분석 중 입니다. \n(클릭 -> 테스트)"
+            android:textSize="33dp"></TextView>
+        <ProgressBar
+            android:layout_marginTop="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></ProgressBar>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/detectCarBox"
+        android:visibility="gone"
+        android:layout_width="350dp"
+        android:layout_height="300dp"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"
+        android:background="@drawable/round_box"
+        android:gravity="center">
+        <TextView
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="차량이 옵니다.\n🚌\n(클릭 -> 테스트)"
+            android:textSize="33dp"></TextView>
+
+    </LinearLayout>
+
+<!--    테스트 버튼-->
+
+
+    <Button
+        android:id="@+id/btnPrev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="40dp"
+        android:text="← 이전"
+        android:textSize="20dp"
+        android:background="@drawable/round_button"/>
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp"
+        android:text="다음 →"
+        android:textSize="20dp"
+        android:background="@drawable/round_button"/>
+</RelativeLayout>
