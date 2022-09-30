@@ -30,7 +30,7 @@
     </fragment>
     <fragment
         android:id="@+id/SoundCheckPage"
-        android:name="com.example.myapplication.SoundCheckPage"
+        android:name="com.example.myapplication.SoundCheckFragment"
         android:label="@string/sound_check_page_label"
         tools:layout="@layout/sound_check_page">
 
@@ -43,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/AnalysisSoundPage"
-        android:name="com.example.myapplication.AnalysisSoundPage"
+        android:name="com.example.myapplication.AnalysisSoundFragment"
         android:label="@string/analysis_sound_page_label"
         tools:layout="@layout/sound_check_page">
 

@@ -26,7 +26,7 @@
             android:gravity="center"
             android:textColor="@color/textColor"
             android:lineSpacingExtra="10dp"
-            android:text="아래 마이크 권한을 꼭 허용 해주세요. \n 아래 마이크 작동 여부가 표시됩니다."></TextView>
+            android:text="마이크 및 진동 권한을 꼭 허용 해주세요. "></TextView>
 
     <!--    1. 마이크 체킹 -->
 <!--        <LinearLayout-->
@@ -42,6 +42,7 @@
                 android:background="@drawable/round_box"
                 android:gravity="center">
                 <TextView
+                    android:id="@+id/checking_permission"
                     android:layout_width="@dimen/box_width"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
@@ -65,6 +66,7 @@
                 android:background="@drawable/round_box"
                 android:gravity="center">
                 <TextView
+                    android:id="@+id/check_text"
                     android:layout_width="@dimen/box_width"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
@@ -72,15 +74,8 @@
                     android:gravity="center"
                     android:textColor="@color/textColor"
                     android:lineSpacingExtra="10dp"
-                    android:text="마이크가 연결되었습니다." />
+                    android:text="마이크가 연결되었습니다.✔" />
 
-                <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FF0000"
-                    android:textSize="30dp"
-                    android:gravity="center"
-                    android:text="✔"/>
             </LinearLayout>
 
         <!--    3. 마이크 연결 안됨-->

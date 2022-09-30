@@ -14,7 +14,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.myapplication.databinding.AnalysisSoundPageBinding;
 
 
-public class AnalysisSoundPage extends Fragment {
+public class AnalysisSoundFragment extends Fragment {
 
     private AnalysisSoundPageBinding binding;
     private Vibrator vibrator;
@@ -37,7 +37,7 @@ public class AnalysisSoundPage extends Fragment {
         binding.btnPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(AnalysisSoundPage.this)
+                NavHostFragment.findNavController(AnalysisSoundFragment.this)
                         .navigate(R.id.action_AnalysisSoundPage_to_SoundCheckPage);
             }
         });

@@ -29,15 +29,6 @@ public class WelcomeSecondFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 화면 터치 -> 메인 1st 페이지
-        binding.welcomePageSecond.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(WelcomeSecondFragment.this)
-                        .navigate(R.id.action_WelcomePageSecond_to_WelcomePageFirst);
-            }
-        });
-
         // 버튼 터치 -> 소리 체크 페이지
         binding.btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
