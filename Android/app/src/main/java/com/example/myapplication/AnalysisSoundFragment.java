@@ -41,14 +41,13 @@ public class AnalysisSoundFragment extends Fragment {
                         .navigate(R.id.action_AnalysisSoundPage_to_SoundCheckPage);
             }
         });
-
-//        binding.btnNext.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                NavHostFragment.findNavController(SoundCheckPage.this)
-//                        .navigate(R.id.action_SecondFragment_to_FirstFragment);
-//            }
-//        });
+        binding.btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(AnalysisSoundFragment.this)
+                        .navigate(R.id.action_AnalysisSoundPage_to_RecordTest);
+            }
+        });
 
         binding.analysisTextBox.setOnClickListener(new View.OnClickListener() {
             @Override

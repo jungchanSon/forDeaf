@@ -50,8 +50,20 @@
         <action
             android:id="@+id/action_AnalysisSoundPage_to_SoundCheckPage"
             app:destination="@id/SoundCheckPage" />
-<!--        <action-->
-<!--            android:id="@+id/action_SoundCheckPage_to_WelcomePageSecond"-->
-<!--            app:destination="@id/WelcomePageSecond" />-->
+        <action
+            android:id="@+id/action_AnalysisSoundPage_to_RecordTest"
+            app:destination="@id/RecordTest" />
     </fragment>
+
+    <fragment
+        android:id="@+id/RecordTest"
+        android:name="com.example.myapplication.TestFrag"
+        android:label="소리 녹음 테스트"
+        tools:layout="@layout/record_test">
+        <action
+            android:id="@+id/action_RecordTest_to_AnalysisSoundPage"
+            app:destination="@id/AnalysisSoundPage" />
+
+    </fragment>
+
 </navigation>
