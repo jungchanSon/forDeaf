@@ -1,4 +1,4 @@
-package audio.exception;
+package com.example.myapplication.jLibrosa.audio.exception;
 
 
 /**

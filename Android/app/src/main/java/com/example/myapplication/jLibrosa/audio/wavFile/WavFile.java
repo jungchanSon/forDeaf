@@ -1,5 +1,4 @@
-package audio.wavFile;
-
+package com.example.myapplication.jLibrosa.audio.wavFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

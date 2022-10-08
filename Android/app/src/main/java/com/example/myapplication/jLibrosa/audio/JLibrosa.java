@@ -1,4 +1,4 @@
-package audio;
+package com.example.myapplication.jLibrosa.audio;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +11,11 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.math3.complex.Complex;
 
-import audio.exception.FileFormatNotSupportedException;
-import audio.process.AudioFeatureExtraction;
-import audio.wavFile.WavFile;
-import audio.wavFile.WavFileException;
+
+import com.example.myapplication.jLibrosa.audio.exception.FileFormatNotSupportedException;
+import com.example.myapplication.jLibrosa.audio.process.AudioFeatureExtraction;
+import com.example.myapplication.jLibrosa.audio.wavFile.WavFile;
+import com.example.myapplication.jLibrosa.audio.wavFile.WavFileException;
 
 /**
  * 

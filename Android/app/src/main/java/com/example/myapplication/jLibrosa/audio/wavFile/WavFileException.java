@@ -1,4 +1,4 @@
-package audio.wavFile;
+package com.example.myapplication.jLibrosa.audio.wavFile;
 
 /**
  * Custom Exception Class to handle errors occurring while loading/reading Wav file.
