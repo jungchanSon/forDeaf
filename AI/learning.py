@@ -90,7 +90,7 @@ def train(path_pkl):
     print(' epoch = ',epoch,'\n','batch_size = ',batch_size,'\n', 'learning_rate = ',learning_rate,'\n', '학습 시작')
     history = model.fit(x_train,y_train,batch_size=batch_size,epochs=epoch)
     
-    results = model.evaluate(x_test, y_test, batch_size=64)A
+    results = model.evaluate(x_test, y_test, batch_size=64)
     print('\n# Evaluate on test data')
     print('test loss, test acc:', results)
     return model,history

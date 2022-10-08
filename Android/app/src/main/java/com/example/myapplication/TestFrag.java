@@ -4,7 +4,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.Bundle;`
 import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +34,6 @@ public class TestFrag extends Fragment {
 
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
-
 
 
     @Override
@@ -132,6 +131,7 @@ public class TestFrag extends Fragment {
 
         binding.currnetRec.setText(audioFileName);
         System.out.println(audioUri);
+
     }
 
     @Override
