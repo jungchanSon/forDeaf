@@ -16,6 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.myapplication.databinding.RecordTestBinding;
+import com.example.myapplication.jLibrosa.audio.JLibrosa;
+import com.example.myapplication.jLibrosa.audio.exception.FileFormatNotSupportedException;
+import com.example.myapplication.jLibrosa.audio.wavFile.WavFileException;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -41,6 +44,11 @@ public class TestFrag extends Fragment {
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
+
+
+
+
+
         audioList = new ArrayList<>();
         binding = RecordTestBinding.inflate(inflater, container, false);
         return binding.getRoot();
@@ -48,6 +56,40 @@ public class TestFrag extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+//        jlibrosa 테스트
+        System.out.println("hello");
+        JLibrosa jLibrosa = new JLibrosa();
+
+        String path = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"001_children_playing.wav";
+
+        int sampleRate = -1;
+        int duration = -1;
+        int samplerate = jLibrosa.getSampleRate();
+
+        float audioFeat [] = new float[0];
+        try {
+            audioFeat = jLibrosa.loadAndRead(path, sampleRate, duration);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (WavFileException e) {
+            e.printStackTrace();
+        } catch (FileFormatNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        float mfccValues[][] = jLibrosa.generateMFCCFeatures(audioFeat, sampleRate, 40);
+
+
+        System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
+        System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
+
+        for(int i=0;i<1;i++) {
+            for(int j=0;j<10;j++) {
+                System.out.printf("%.6f%n", mfccValues[i][j]);
+            }
+        }
+//        jlibrosa 테스트 end
+
 
         vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         record_status = binding.recordStatus;
@@ -81,7 +123,8 @@ public class TestFrag extends Fragment {
                 mediaPlayer = new MediaPlayer();
 
                 try{
-                    mediaPlayer.setDataSource(getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"test.mp3");
+                    mediaPlayer.setDataSource(getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"001_children_playing.wav");
+                    System.out.println(getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"001_children_playing.wav");
                     mediaPlayer.prepare();
                     mediaPlayer.start();
                 } catch (IOException e){
