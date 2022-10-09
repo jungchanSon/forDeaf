@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
+
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -15,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.myapplication.audioManager.AudioManager;
 import com.example.myapplication.databinding.RecordTestBinding;
 import com.example.myapplication.jLibrosa.audio.JLibrosa;
 import com.example.myapplication.jLibrosa.audio.exception.FileFormatNotSupportedException;
@@ -26,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class TestFrag extends Fragment {
+public class TestFrag extends Fragment implements MediaRecorder.OnInfoListener {
 
     private RecordTestBinding binding;
     private Vibrator vibrator;
@@ -38,6 +41,8 @@ public class TestFrag extends Fragment {
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
 
+    private AudioManager audioManager;
+
 
     @Override
     public View onCreateView(
@@ -45,10 +50,7 @@ public class TestFrag extends Fragment {
             Bundle savedInstanceState
     ) {
 
-
-
-
-
+        audioManager = new AudioManager();
         audioList = new ArrayList<>();
         binding = RecordTestBinding.inflate(inflater, container, false);
         return binding.getRoot();
@@ -90,10 +92,10 @@ public class TestFrag extends Fragment {
         }
 //        jlibrosa 테스트 end
 
-
         vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         record_status = binding.recordStatus;
 
+        // 뒤 페이지로 이동
         binding.testBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,6 +104,7 @@ public class TestFrag extends Fragment {
             }
         });
 
+        // 녹음 테스트
         binding.recordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,12 +120,14 @@ public class TestFrag extends Fragment {
                 }
             }
         });
+        // 임시 재생 테스트.
         binding.imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mediaPlayer = new MediaPlayer();
 
                 try{
+
                     mediaPlayer.setDataSource(getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"001_children_playing.wav");
                     System.out.println(getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"001_children_playing.wav");
                     mediaPlayer.prepare();
@@ -144,11 +149,16 @@ public class TestFrag extends Fragment {
     private void startRecord(){
         String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        audioFileName = recordPath + "/" +"RecordExample_" + timeStamp + "_"+"audio.mp4";
-        audioFileName = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"test.mp3";
+
+        audioFileName = recordPath + "/" +"RecordExample_" + timeStamp + "_"+"audio.mp4";
+        audioFileName = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/" + timeStamp+".wav";
+
+
         mediaRecorder = new MediaRecorder();
+        mediaRecorder.setOnInfoListener(this);
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC); //입력 형식
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS); // 출력 형식 지정
+        mediaRecorder.setMaxDuration(2000);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC); //인코딩
         mediaRecorder.setOutputFile(audioFileName); // 음성 데이터를 저장할 파일 지정
 
@@ -183,4 +193,20 @@ public class TestFrag extends Fragment {
         binding = null;
     }
 
+    // max 녹화 시간에 따른 콜백함수
+    @Override
+    public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
+        if (i == MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+            System.out.println("Rec onInfo..");
+            mediaRecorder.stop();
+
+            audioManager.addAudioList(audioFileName);
+            System.out.println("save :" +audioFileName);
+            binding.currnetRec.setText(audioFileName);
+            System.out.println("audioManager : " + audioManager);
+            mediaRecorder.release();
+
+            mediaRecorder.start();
+        }
+    }
 }
