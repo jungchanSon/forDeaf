@@ -35,6 +35,7 @@ def make_dataframe(file_path_audio,file_path_csv):
     df = pd.read_csv(path_csv)
     features = []
     
+    #폴더 1~10까지 반복
     for i in range(1,10):
         for file_name in file_list_wav:
             print(file_name)
@@ -55,6 +56,7 @@ def make_dataframe(file_path_audio,file_path_csv):
     print("feature_df.pkl 생성 완료")
     return
 
+#전처리 실행해주는 함수 -> 컴파일 후 콘솔에서 실행
 def pre_processing():
     audio_path = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/dataset/UrbanSound8k/audio/'
     csv_path = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/dataset/UrbanSound8k/metadata'
