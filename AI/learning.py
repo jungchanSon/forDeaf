@@ -38,6 +38,7 @@ def make_model(n_columns,n_row,n_channels,n_classes):
     model.add(tf.keras.layers.Dense(units=10,activation='softmax'))
     return model
 
+#모델 수정 후 모델 구조 확인
 def show_model():
     ###mfccs 구조
     n_columns = 87
@@ -48,7 +49,8 @@ def show_model():
     model = make_model(n_columns,n_row,n_channels,n_classes)
     model.summary()
     return
-    
+
+#학습 시작
 def train(path_pkl):
     #mfccs와 class label이 저장된 pkl로드
     feature_df = pd.read_pickle(path_pkl)
@@ -80,7 +82,7 @@ def train(path_pkl):
     ###하이퍼 파라미터
     ###epoch, batch_size, lr, opt, loss function
     ###50, 64, 0.001, Adam, categorical_crossentropy
-    epoch = 30
+    epoch = 15
     batch_size = 64
     learning_rate = 0.001
     opt = keras.optimizers.Adam(learning_rate=learning_rate)
@@ -95,28 +97,32 @@ def train(path_pkl):
     print('test loss, test acc:', results)
     return model,history
 
+#plt plot출력(acc,loss)
 def plot_history(history) :
     plt.plot(history.history['accuracy'], label='accuracy')
     plt.plot(history.history['loss'], label='loss')
     plt.legend()
     return
 
+#모델 세이브
 def save_model(model,name):
     model.save(name)
     print(name,'으로 모델 저장 완료.')
     return
 
-def run():
-    dir = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl'
-    model,history = train(dir)
-    plot_history(history)
-
-    # tflite 변환 추가
-    converter = tf.lite.TFLiteConverter.from_saved_model(dir)
+#ftlite 로 변환
+def tflite_convert(model):
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
     tflite_model = converter.convert()
     open("converted_model.tflite", "wb").write(tflite_model)
-
+    return
+    
+#시작
+def run():
+    model,history = train('C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl')
+    plot_history(history)
     return
 
+#변수들 보고싶으면 해제 후 실행
 model,history = train('C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl')
 plot_history(history)
