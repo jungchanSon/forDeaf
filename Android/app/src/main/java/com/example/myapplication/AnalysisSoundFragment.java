@@ -60,7 +60,7 @@ public class AnalysisSoundFragment extends Fragment{
 
         handler = new Handler();
         binding = AnalysisSoundPageBinding.inflate(inflater, container, false);
-        audioDuration = 2000;
+        audioDuration = 5000;
 
         mfccManager = new MFCCManager();
 
@@ -163,6 +163,21 @@ public class AnalysisSoundFragment extends Fragment{
                     if(isRecord){
                         try {
                             stopRecord();
+                            mfccManager.addMFCC(audioFileName);
+
+//                          mfcc 값 테스트 출력
+                            float mfccV[][] = mfccManager.popMFCC();
+                            String s = "";
+                            for(int ii=0;ii<1;ii++) {
+                                for(int j=0;j<10;j++) {
+                                    s += "\n";
+                                    s +=  mfccV[ii][j];
+                                }
+                            }
+
+                            binding.testText.setText(
+                                    "5초 단위 mfcc 값 "+ new SimpleDateFormat("HH시mm분ss초").format(new Date()) + s
+                            );
                             repeatRecord(duration);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -177,6 +192,7 @@ public class AnalysisSoundFragment extends Fragment{
 
 
     private void startRecord() throws IOException {
+
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         audioFileName = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/" + timeStamp+".wav";
 
@@ -189,6 +205,7 @@ public class AnalysisSoundFragment extends Fragment{
                 )
         );
 
+
         File file = new File(audioFileName);
 
         recorder = OmRecorder.wav(
@@ -197,6 +214,7 @@ public class AnalysisSoundFragment extends Fragment{
         );
 
         recorder.startRecording();
+        System.out.println(mfccManager);
         System.out.println(audioFileName);
     }
 

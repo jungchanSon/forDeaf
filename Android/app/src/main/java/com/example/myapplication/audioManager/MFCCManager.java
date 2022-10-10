@@ -33,7 +33,7 @@ public class MFCCManager {
     public void addMFCC(String path){
 
         float audioFeat [] = new float[0];
-
+        System.out.println("path  == " + path);
         try {
             audioFeat = jLibrosa.loadAndRead(path, sampleRate, duration);
         } catch (IOException e) {
@@ -48,7 +48,11 @@ public class MFCCManager {
 
         this.mfccList.add(mfccValues);
 
-        System.out.println(mfccValues);
+        for(int ii=0;ii<1;ii++) {
+            for(int j=0;j<10;j++) {
+                System.out.printf("%.6f%n", mfccValues[ii][j]);
+            }
+        }
     }
     public float[][] popMFCC(){
         if(!this.mfccList.isEmpty()){
@@ -59,10 +63,10 @@ public class MFCCManager {
         return null;
     }
 
+
+
     @Override
     public String toString() {
-        return "MFCCManager{" +
-                "mfccList=" + mfccList +
-                '}';
+        return  " " + mfccList ;
     }
 }
