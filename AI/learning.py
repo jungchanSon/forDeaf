@@ -107,8 +107,15 @@ def save_model(model,name):
     return
 
 def run():
-    model,history = train('C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl')
+    dir = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl'
+    model,history = train(dir)
     plot_history(history)
+
+    # tflite 변환 추가
+    converter = tf.lite.TFLiteConverter.from_saved_model(dir)
+    tflite_model = converter.convert()
+    open("converted_model.tflite", "wb").write(tflite_model)
+
     return
 
 model,history = train('C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl')

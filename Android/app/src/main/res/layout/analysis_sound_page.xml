@@ -15,15 +15,23 @@
         android:layout_marginTop="150dp"
         android:background="@drawable/round_box"
         android:gravity="center">
+
         <TextView
+            android:id="@+id/text_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="소리를 분석 중 입니다. \n(클릭 -> 테스트)"
+            android:text="소리를 분석 중 입니다."
             android:textSize="33dp"></TextView>
+
         <ProgressBar
             android:layout_marginTop="30dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"></ProgressBar>
+        <TextView
+            android:id="@+id/test_Text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""></TextView>
     </LinearLayout>
 
     <LinearLayout
@@ -47,7 +55,6 @@
 
 <!--    테스트 버튼-->
 
-
     <Button
         android:id="@+id/btnPrev"
         android:layout_width="wrap_content"
@@ -61,7 +68,7 @@
         android:textSize="20dp"
         android:background="@drawable/round_button"/>
     <Button
-        android:id="@+id/btnNext"
+        android:id="@+id/btnStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -69,7 +76,7 @@
 
         android:layout_marginRight="40dp"
         android:layout_marginBottom="40dp"
-        android:text="다음 →"
+        android:text="중지 →"
         android:textSize="20dp"
         android:background="@drawable/round_button"/>
 </RelativeLayout>

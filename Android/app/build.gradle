@@ -60,5 +60,7 @@ dependencies {
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
+    //wave 파일 변환
+    implementation 'com.kailashdabhi:om-recorder:1.1.5'
 
 }
