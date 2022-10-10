@@ -5,9 +5,8 @@ import android.media.AudioFormat;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.Handler;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,10 +33,9 @@ import omrecorder.OmRecorder;
 import omrecorder.PullTransport;
 import omrecorder.PullableSource;
 import omrecorder.Recorder;
-import omrecorder.WriteAction;
 
 
-public class AnalysisSoundFragment extends Fragment implements MediaRecorder.OnInfoListener {
+public class AnalysisSoundFragment extends Fragment{
 
     private AnalysisSoundPageBinding binding;
     private Vibrator vibrator;
@@ -49,9 +47,10 @@ public class AnalysisSoundFragment extends Fragment implements MediaRecorder.OnI
     private MediaPlayer mediaPlayer;
 
     private MFCCManager mfccManager;
-    private int duration;
+    private int audioDuration;
     private boolean isRecord;
     private Recorder recorder;
+    private Handler handler;
 
     @Override
     public View onCreateView(
@@ -59,8 +58,9 @@ public class AnalysisSoundFragment extends Fragment implements MediaRecorder.OnI
             Bundle savedInstanceState
     ) {
 
+        handler = new Handler();
         binding = AnalysisSoundPageBinding.inflate(inflater, container, false);
-        duration = 2000;
+        audioDuration = 2000;
 
         mfccManager = new MFCCManager();
 
@@ -71,37 +71,54 @@ public class AnalysisSoundFragment extends Fragment implements MediaRecorder.OnI
         super.onViewCreated(view, savedInstanceState);
 
         vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+//        JLibrosa jLibrosa= new JLibrosa();
+//        int sampleRate = -1;
+//        int duration = -1;
+//        int samplerate = jLibrosa.getSampleRate();
+//        String path = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"20221010_110344.wav";
+//
+//
+//        float audioFeat [] = new float[0];
+//        try {
+//            audioFeat = jLibrosa.loadAndRead(path, sampleRate, duration);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (WavFileException e) {
+//            e.printStackTrace();
+//        } catch (FileFormatNotSupportedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        float mfccValues[][] = jLibrosa.generateMFCCFeatures(audioFeat, sampleRate, 40);
+//
+//
+//        System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
+//        System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
+//
+//        for(int ii=0;ii<1;ii++) {
+//            for(int j=0;j<10;j++) {
+//                System.out.printf("%.6f%n", mfccValues[ii][j]);
+//            }
+//        }
 
-        //오디오 녹음 시작
+//        오디오 녹음 시작
         isRecord = true;
-        try {
-            startRecord();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-//        startRecord();
+        repeatRecord(audioDuration);
 
         binding.btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                if(isRecord){
-                   isRecord = false;
-//                   mediaRecorder.stop();
-//                   mediaRecorder.release();
+                       isRecord = false;
                    try {
-                       startRecord();
+                       recorder.stopRecording();
                    } catch (IOException e) {
                        e.printStackTrace();
                    }
                    binding.textInfo.setText("분석을 중지합니다.");
                } else{
                    isRecord = true;
-//                   startRecord();
-                   try {
-                       recorder.stopRecording();
-                   } catch (IOException e) {
-                       e.printStackTrace();
-                   }
+                   repeatRecord(audioDuration);
                    binding.textInfo.setText("분석을 시작합니다.");
 
                }
@@ -136,113 +153,60 @@ public class AnalysisSoundFragment extends Fragment implements MediaRecorder.OnI
         });
     }
 
+    private void repeatRecord(int duration) {
+        try {
+            startRecord();
+            isRecord = true;
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(isRecord){
+                        try {
+                            stopRecord();
+                            repeatRecord(duration);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }, duration);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void startRecord() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         audioFileName = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/" + timeStamp+".wav";
 
-        Recorder recorder = OmRecorder.wav(
-                new PullTransport.Noise(new PullableSource.Default(
-                        new AudioRecordConfig.Default(
-                                MediaRecorder.AudioSource.MIC, AudioFormat.ENCODING_PCM_16BIT,
-                                AudioFormat.CHANNEL_IN_MONO, 44100
-                        )
-                ) ,
-                        new PullTransport.OnAudioChunkPulledListener() {
-                            @Override public void onAudioChunkPulled(AudioChunk audioChunk) {
-                                System.out.println("onAudioChunkPulled");
-                            }
-                        },
-                        new WriteAction.Default(),
-                        new Recorder.OnSilenceListener() {
-                            @Override public void onSilence(long silenceTime) {
-                                System.out.println("onSilence");
-                            }
-                        }, 200
-                ), new File(audioFileName)
+        PullableSource.Default mic = new PullableSource.Default(
+                new AudioRecordConfig.Default(
+                        MediaRecorder.AudioSource.MIC,
+                        AudioFormat.ENCODING_PCM_16BIT,
+                        AudioFormat.CHANNEL_IN_MONO,
+                        44100
+                )
         );
 
+        File file = new File(audioFileName);
 
-//        @NonNull private File file() {
-//            return new File(Environment.getExternalStorageDirectory(), "demo.wav");
-//        }
+        recorder = OmRecorder.wav(
+                new PullTransport.Default(mic),
+                file
+        );
 
-
-
-//        mediaRecorder = new MediaRecorder();
-//        mediaRecorder.setOnInfoListener(this);
-//        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC); //입력 형식
-//        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS); // 출력 형식 지정
-//        mediaRecorder.setMaxDuration(duration);
-//        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC); //인코딩
-//        mediaRecorder.setOutputFile(audioFileName); // 음성 데이터를 저장할 파일 지정
-
-//        try{
-//            mediaRecorder.prepare();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        mediaRecorder.start();
         recorder.startRecording();
         System.out.println(audioFileName);
+    }
+
+    private void stopRecord() throws IOException {
+        recorder.stopRecording();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    @Override
-    public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
-
-        if(i == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
-            System.out.println("listened Max Duration");
-
-            mediaRecorder.stop();
-            mediaRecorder.release();
-//            mediaRecorder.reset();
-
-//            mfccManager.addMFCC(audioFileName);
-//            binding.testText.setText(""+ mfccManager);
-            System.out.println(audioFileName);
-            JLibrosa jLibrosa= new JLibrosa();
-            int sampleRate = -1;
-            int duration = -1;
-            int samplerate = jLibrosa.getSampleRate();
-            String path = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/"+"001_children_playing.wav";
-
-
-            float audioFeat [] = new float[0];
-            try {
-                audioFeat = jLibrosa.loadAndRead(path, sampleRate, duration);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (WavFileException e) {
-                e.printStackTrace();
-            } catch (FileFormatNotSupportedException e) {
-                e.printStackTrace();
-            }
-
-            float mfccValues[][] = jLibrosa.generateMFCCFeatures(audioFeat, sampleRate, 40);
-
-
-            System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
-            System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
-
-            for(int ii=0;ii<1;ii++) {
-                for(int j=0;j<10;j++) {
-                    System.out.printf("%.6f%n", mfccValues[ii][j]);
-                }
-            }
-
-            if (isRecord){
-                System.out.println("restart");
-                try {
-                    startRecord();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 }
