@@ -53,6 +53,7 @@ def model_evaluate(model_path,path_pkl):
 9 – street_music
 '''
 
+#모델경로와 데이터파일(pkl) 파일 경로 수정 필요
 model_path = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/test_0.1'
 path_pic = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl'
 test_pre,test_predicted = testing(model_path,path_pic)
