@@ -81,7 +81,7 @@ def train(path_pkl):
 
     ###하이퍼 파라미터
     ###epoch, batch_size, lr, opt, loss function
-    ###50, 64, 0.001, Adam, categorical_crossentropy
+    ###15, 64, 0.001, Adam, categorical_crossentropy
     epoch = 15
     batch_size = 64
     learning_rate = 0.001

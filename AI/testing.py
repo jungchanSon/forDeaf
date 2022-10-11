@@ -27,6 +27,7 @@ def model_evaluate(model_path,path_pkl):
     y = np.array(feature_df.class_label.tolist())
     y = to_categorical(LabelEncoder().fit_transform(y))
 
+    #모델 구조 변경할 수도.
     n_columns = 87
     n_row = 40
     n_channels = 1
@@ -54,6 +55,10 @@ def model_evaluate(model_path,path_pkl):
 '''
 
 #모델경로와 데이터파일(pkl) 파일 경로 수정 필요
+
+##추가할 사항
+## 검증용 pkl파일 생성후 로드하여 정확도 테스트
+
 model_path = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/test_0.1'
 path_pic = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl'
 test_pre,test_predicted = testing(model_path,path_pic)
@@ -67,9 +72,5 @@ for idx, per in enumerate(test_predicted):
     
 print('정답확률 = ',res)
 
-#7857개의 소리데이터 -> sound generator를 통해 더 많은 데이터를 생성하여 학습필요
-#일부 성능을 저하시킨다고 생각되는 sound(aircon,gun_shot...) 제거 필요
-#-> 제거한 sound 는 test case 에 포함시켜 일정 threshhold 이하로 나오는지 테스트
-#일정 Threshhold 이하는 undefined태그 
 
 
