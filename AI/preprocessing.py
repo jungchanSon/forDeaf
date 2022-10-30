@@ -15,10 +15,12 @@ import os
 #file_name에 해당하는 파일의 mfccs를 생성,리턴
 def make_mfccs(file_name):
     max_pad_len = 22
+    time = 1
     audio,sr = librosa.load(file_name) #sr = 22050/s
     
-    #원본 신호 1초로 trim(최대 peak기준)
-    audio = trim_audio(audio,sr)
+    #원본 신호 time초로 trim(최대 peak기준)
+    #audio(파형), sr(sampling rate), Time(초) 을 인자로 받음
+    audio = trim_audio(audio,sr,time)
     
     D = np.abs(librosa.stft(audio, n_fft=4096, win_length=4096, hop_length=1024))
     mfcc = librosa.feature.mfcc(S = librosa.power_to_db(D),sr=sr,n_mfcc=40)
@@ -30,7 +32,7 @@ def make_mfccs(file_name):
     return mfcc
 
 #audio를 1초(가능하면)로 trim해주는 함수
-def trim_audio(audio,sr):
+def trim_audio(audio,sr,time):
     '''
     #원본 신호의 정보를 출력해 주는 test부분
     print("Max = ",np.max(audio))
@@ -39,10 +41,10 @@ def trim_audio(audio,sr):
     librosa.display.waveshow(audio,sr=sr)
     plt.show()
     '''
-    time_back = np.argmax(audio)-0.5*sr
-    time_front = np.argmax(audio)+0.5*sr
+    time_back = np.argmax(audio)-(time/2)*sr
+    time_front = np.argmax(audio)+(time/2)*sr
     if time_back < 0:
-        err = 0.5*sr - np.argmax(audio)
+        err = (time/2)*sr - np.argmax(audio)
         time_front+=err
         time_back+=err
     if time_front > len(audio):
@@ -51,7 +53,7 @@ def trim_audio(audio,sr):
         time_back-=err
         
     trim_audio = audio[round(time_back):round(time_front)]
-    if len(trim_audio)/sr != 1.0:
+    if len(trim_audio)/sr != time:
         print("Time = ",len(trim_audio)/sr)
     '''
     #바뀐 신호의 정보를 출력해 주는 test 부분
