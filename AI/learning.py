@@ -30,9 +30,11 @@ def make_model(n_columns,n_row,n_channels,n_classes):
     model.add(layers.MaxPooling2D(pool_size=2))
     model.add(layers.Dropout(0.2))
     
+    '''
     model.add(layers.Conv2D(kernel_size=2,filters=128,activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=2))
     model.add(layers.Dropout(0.2))
+    '''
     
     model.add(layers.GlobalAveragePooling2D())
     model.add(tf.keras.layers.Dense(units=10,activation='softmax'))
@@ -41,7 +43,7 @@ def make_model(n_columns,n_row,n_channels,n_classes):
 #모델 수정 후 모델 구조 확인
 def show_model():
     ###mfccs 구조
-    n_columns = 87
+    n_columns = 22
     n_row = 40
     n_channels = 1
     n_classes = 10
@@ -64,7 +66,7 @@ def train(path_pkl):
     x_train,x_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state = 42)
 
     ###mfccs 구조
-    n_columns = 87
+    n_columns = 22
     n_row = 40
     n_channels = 1
     n_classes = 10
@@ -81,8 +83,8 @@ def train(path_pkl):
 
     ###하이퍼 파라미터
     ###epoch, batch_size, lr, opt, loss function
-    ###50, 64, 0.001, Adam, categorical_crossentropy
-    epoch = 15
+    ###15, 64, 0.001, Adam, categorical_crossentropy
+    epoch = 50
     batch_size = 64
     learning_rate = 0.001
     opt = keras.optimizers.Adam(learning_rate=learning_rate)
@@ -111,10 +113,10 @@ def save_model(model,name):
     return
 
 #ftlite 로 변환
-def tflite_convert(model):
+def tflite_convert(model,name):
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     tflite_model = converter.convert()
-    open("converted_model.tflite", "wb").write(tflite_model)
+    open(name, "wb").write(tflite_model)
     return
     
 #시작
