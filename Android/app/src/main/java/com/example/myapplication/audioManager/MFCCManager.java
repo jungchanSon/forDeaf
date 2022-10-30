@@ -8,16 +8,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class MFCCManager {
-    ArrayList<float[][]> mfccList = new ArrayList<>();
-    JLibrosa jLibrosa = new JLibrosa();
+    private ArrayList<float[][]> mfccList = new ArrayList<>();
+    private JLibrosa jLibrosa = new JLibrosa();
 
-    int sampleRate;
-    int duration;
-    int samplerate = jLibrosa.getSampleRate();
+    private int sampleRate = -1;
+    private int duration = -1;
+    private int samplerate = jLibrosa.getSampleRate();
 
     public MFCCManager(){
-        samplerate = -1;
-        duration = -1;
     }
 
     public MFCCManager(int sampleRate, int duration){
@@ -48,15 +46,22 @@ public class MFCCManager {
 
         this.mfccList.add(mfccValues);
 
-        for(int ii=0;ii<1;ii++) {
-            for(int j=0;j<10;j++) {
-                System.out.printf("%.6f%n", mfccValues[ii][j]);
-            }
-        }
+//        for(int ii=0;ii<1;ii++) {
+//            for(int j=0;j<10;j++) {
+//                System.out.printf("%.6f%n", mfccValues[ii][j]);
+//            }
+//        }
     }
     public float[][] popMFCC(){
         if(!this.mfccList.isEmpty()){
             System.out.println("pop MFCC");
+//            float[][] item = this.mfccList.remove(0);
+//            for(int i = 0; i < item[0].length; i++){
+//                for(int j = 0; j <item[0=].length; j++ ){
+//                    System.out.println(item[i][j]);
+//                }
+//                System.out.println();
+//            }
             return this.mfccList.remove(0);
         }
         System.out.println("mfcc 리스트가 비어 있음!");

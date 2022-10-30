@@ -16,7 +16,7 @@ def make_mfccs(file_name):
     max_pad_len = 87
     audio,sr = librosa.load(file_name)
    
-    print('sr = ',sr)
+    print('sr = ', sr)
     D = np.abs(librosa.stft(audio, n_fft=4096, win_length=4096, hop_length=1024))
     mfcc = librosa.feature.mfcc(S = librosa.power_to_db(D),sr=sr,n_mfcc=40)
     pad_width = max_pad_len - mfcc.shape[1]
