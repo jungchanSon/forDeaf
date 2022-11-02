@@ -36,6 +36,8 @@ public class AnalysisSoundFragment extends Fragment{
 
     private int audioDuration = 1000;
     private boolean isRecord = true;
+    String model_path = "fordeaf.tflite";
+
     private String[] labels_test = {
             "air_conditioner",
             "car_horn",
@@ -53,20 +55,20 @@ public class AnalysisSoundFragment extends Fragment{
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
-    ) {
+        ){
 
             handler = new Handler();
             binding = AnalysisSoundPageBinding.inflate(inflater, container, false);
 
-        vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-        mfccManager = new MFCCManager();
-        recordManager = new RecordManager(getActivity());
+            vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            mfccManager = new MFCCManager();
+            recordManager = new RecordManager(getActivity());
 
-        //Apk 할때
-//      String model_path = "file:///android_asset/fordeaf.tflite";
-        String model_path = getActivity().getExternalFilesDir("/").getAbsolutePath() + "/" + "fordeaf.tflite";
-
-        modelManager = new ModelManager(model_path);
+        try {
+            modelManager = new ModelManager(AnalysisSoundFragment.this.getActivity(), model_path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return binding.getRoot();
     }
