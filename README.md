@@ -9,6 +9,8 @@
 --------------------
 ### 동작 방식 설명
 > 안드로이드 어플리케이션을 통한 소리 데이터 분석 -> AI 모델을 통한 위험 신호 분류 -> 결과에 따라 보조기기에 진동으로 피드백  
+> ![image](https://user-images.githubusercontent.com/113767545/198918223-1a1c0b23-df07-4d69-b4f2-2f9eb3ea9064.png)  
+
 --------------------
 ### 개발에 사용된 데이터 셋
 >![image](https://user-images.githubusercontent.com/113767545/197114140-687f12ed-ec37-4ad1-b64f-c95bde73f482.png)
