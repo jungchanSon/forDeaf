@@ -149,7 +149,7 @@ public class AnalysisSoundFragment extends Fragment{
                                 Log.i("Model outputs", ""+i+output[0][i]);
                             }
 
-                            if(output[0][1] > 0.3){
+                            if(output[0][1] > 0.5){
                                 vibrator.vibrate(500);
                             }
                             binding.testText.setText(
@@ -159,6 +159,22 @@ public class AnalysisSoundFragment extends Fragment{
                                     labels_test[6]+": "+round(output[0][6], 3) + labels_test[7]+"   : "+round(output[0][7], 3) +"\n" +
                                     labels_test[8]+": "+round(output[0][8], 3) + labels_test[9]+"   : "+round(output[0][9], 3) +"\n"
                             );
+
+                            //test용
+                            int maxI = 0;
+                            float maxV = output[0][1];
+
+                            for(int i=0; i<output[0].length; i++){
+                                if (maxV < output[0][i]){
+                                    maxV = output[0][i];
+                                    maxI = i;
+                                }
+                            }
+
+                            binding.textMostValueTest.setText(
+                                    labels_test[maxI]+"\n" + round(maxV, 3)
+                            );
+
                             repeatRecord(duration);
                         } catch (IOException e) {
                             e.printStackTrace();

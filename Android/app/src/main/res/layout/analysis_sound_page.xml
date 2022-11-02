@@ -17,6 +17,12 @@
         android:gravity="center">
 
         <TextView
+            android:id="@+id/text_most_value_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="35dp"></TextView>
+        <TextView
             android:id="@+id/text_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
