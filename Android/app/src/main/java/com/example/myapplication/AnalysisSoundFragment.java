@@ -20,6 +20,8 @@ import com.example.myapplication.manager.MFCCManager;
 import com.example.myapplication.databinding.AnalysisSoundPageBinding;
 import com.example.myapplication.manager.ModelManager;
 import com.example.myapplication.manager.RecordManager;
+
+import java.io.File;
 import java.io.IOException;
 
 public class AnalysisSoundFragment extends Fragment{
@@ -63,6 +65,7 @@ public class AnalysisSoundFragment extends Fragment{
         //Apk 할때
 //      String model_path = "file:///android_asset/fordeaf.tflite";
         String model_path = getActivity().getExternalFilesDir("/").getAbsolutePath() + "/" + "fordeaf.tflite";
+
         modelManager = new ModelManager(model_path);
 
         return binding.getRoot();
@@ -174,6 +177,9 @@ public class AnalysisSoundFragment extends Fragment{
                             binding.textMostValueTest.setText(
                                     labels_test[maxI]+"\n" + round(maxV, 3)
                             );
+
+                            new File(audioFileName).delete();
+                            Log.d("delete", "run: delete file");
 
                             repeatRecord(duration);
                         } catch (IOException e) {
