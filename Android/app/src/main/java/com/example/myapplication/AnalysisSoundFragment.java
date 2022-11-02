@@ -1,12 +1,14 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.media.AudioFormat;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,27 +18,26 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.myapplication.audioManager.MFCCManager;
+import com.example.myapplication.manager.MFCCManager;
 import com.example.myapplication.databinding.AnalysisSoundPageBinding;
 import com.example.myapplication.jLibrosa.audio.JLibrosa;
 import com.example.myapplication.jLibrosa.audio.exception.FileFormatNotSupportedException;
 import com.example.myapplication.jLibrosa.audio.wavFile.WavFileException;
+import com.example.myapplication.manager.ModelManager;
 
 import org.tensorflow.lite.Interpreter;
-import org.tensorflow.lite.TensorFlowLite;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import omrecorder.AudioChunk;
 import omrecorder.AudioRecordConfig;
 import omrecorder.OmRecorder;
 import omrecorder.PullTransport;
@@ -73,7 +74,7 @@ public class AnalysisSoundFragment extends Fragment{
     //        모델 테스트코드 시작
             JLibrosa jLibrosa = new JLibrosa();
 
-            String path = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/" + "001_children_playing"+".wav";
+            String path = getActivity().getExternalFilesDir("/").getAbsolutePath()+"/" + "car.wav";
         System.out.println("path = " + path);
             int sampleRate = -1;
             int duration = -1;
@@ -81,7 +82,8 @@ public class AnalysisSoundFragment extends Fragment{
             System.out.println("samplerate = " + samplerate);
             float audioFeat [] = new float[0];
             try {
-                audioFeat = jLibrosa.loadAndRead(path, samplerate, duration);
+//                audioFeat = jLibrosa.loadAndRead(path, samplerate, duration);
+                audioFeat = jLibrosa.loadAndRead(path, 22050, 3);
                 System.out.println("audioFeat = " + audioFeat);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -95,16 +97,23 @@ public class AnalysisSoundFragment extends Fragment{
 
         System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
         System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
-        float[][][][] tempmfcc = {{ mfccValues }};
-        System.out.println("Size of MFCC Feature Values: (" + tempmfcc.length + " , " + tempmfcc[0].length + "," +tempmfcc[0][0].length+", "+ tempmfcc[0][0][0].length + " )");
-
+        float[][][] tempmfcc = new float[1][40][22];
+        System.out.println("Size of MFCC Feature Values: (" + tempmfcc.length + " , " + tempmfcc[0].length + "," +tempmfcc[0][0].length+ " )");
+        for(int i=0; i<40; i++){
+            for(int j=0; j<22; j++){
+                tempmfcc[0][i][j] = mfccValues[i][j];
+            }
+        }
         for(int i=0;i<1;i++) {
             for(int j=0;j<10;j++) {
                 System.out.printf("%.6f%n", mfccValues[i][j]);
             }
         }
-        String model_path = getActivity().getExternalFilesDir("/").getAbsolutePath() + "/" + "For_Deaf.tflite";
+
+        System.out.println("tffile load");
+        String model_path = getActivity().getExternalFilesDir("/").getAbsolutePath() + "/" + "fordeaf.tflite";
         FileInputStream f_input_stream= null;
+        System.out.println("tffile... ㅁㄴㅇㄹ");
         try {
             f_input_stream = new FileInputStream(new File(model_path));
         } catch (FileNotFoundException e) {
@@ -118,7 +127,7 @@ public class AnalysisSoundFragment extends Fragment{
             e.printStackTrace();
         }
 
-        float[] outputs = new float[0];
+        float[][] outputs = new float[1][10];
         Interpreter interpreter = new Interpreter(tflite_model);
         interpreter.allocateTensors();
         int outputTensorCount = interpreter.getOutputTensorCount();
@@ -128,12 +137,15 @@ public class AnalysisSoundFragment extends Fragment{
         interpreter.run(tempmfcc, outputs);
         System.out.println("interpreter = " + interpreter);
         System.out.println("outputs = " + outputs);
+        for(int i=0; i<10; i++){
+            System.out.println(i+ " : " + outputs[0][i]);
+        }
         //        모델 테스트코드 끝
             mfccList = new ArrayList();
 
             handler = new Handler();
             binding = AnalysisSoundPageBinding.inflate(inflater, container, false);
-            audioDuration = 2000;
+            audioDuration = 1000;
 
     //        try{
     //
@@ -193,7 +205,7 @@ public class AnalysisSoundFragment extends Fragment{
 //        오디오 녹음 시작
         isRecord = true;
         //위 테스트 끝나면 주석 풀기!
-//        repeatRecord(audioDuration);
+        repeatRecord(audioDuration);
 
         binding.btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,15 +217,19 @@ public class AnalysisSoundFragment extends Fragment{
                    } catch (IOException e) {
                        e.printStackTrace();
                    }
+                   binding.btnStop.setText("시작");
                    binding.textInfo.setText("분석을 중지합니다.");
                } else{
                    isRecord = true;
-                   repeatRecord(audioDuration);
                    binding.textInfo.setText("분석을 시작합니다.");
+                   binding.btnStop.setText("중지");
+                   repeatRecord(audioDuration);
 
                }
             }
         });
+
+
 
         binding.btnPrev.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -252,44 +268,46 @@ public class AnalysisSoundFragment extends Fragment{
                 public void run() {
                     if(isRecord){
                         try {
+//                            String model_path = "file:///android_asset/fordeaf.tflite";
                             stopRecord();
-                            System.out.println("audioFileName :: ::  >> "+audioFileName);
                             mfccManager.addMFCC(audioFileName);
-                            //                            ===
-//
-//                            int sampleRate = -1;
-//                            int duration = -1;
-//                            int samplerate = jLibrosa.getSampleRate();
-//
-//                            String path =   audioFileName;
-//
-//                            float audioFeat [] = new float[0];
-//                            try {
-//                                audioFeat = jLibrosa.loadAndRead(path, sampleRate, duration);
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            } catch (WavFileException e) {
-//                                e.printStackTrace();
-//                            } catch (FileFormatNotSupportedException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                            float mfccValues[][] = jLibrosa.generateMFCCFeatures(audioFeat, sampleRate, 40);
-//                            ---
-//                          mfcc 값 테스트 출력
 
-                            float [][] data = mfccManager.popMFCC();
-                            System.out.println(">>>>>>>");
-                            for(int ii=0;ii<1;ii++) {
-                                for (int j = 0; j < 10; j++) {
-                                    System.out.printf("%.6f%n", data[ii][j]);
-                                }
+                            float [][][] data = mfccManager.popMFCC3D();
+                            Log.d("pop MFCC", "run: popMFCC3D() -> " + data);
+
+                            String model_path = getActivity().getExternalFilesDir("/").getAbsolutePath() + "/" + "fordeaf.tflite";
+                            ModelManager modelManager = new ModelManager(model_path);
+//
+//                            Interpreter interpreter = modelManager.getInterpreter();
+//                            float[][] outputs = new float[1][10];
+//
+//                            interpreter.allocateTensors();
+//
+//                            interpreter.run(data, outputs);
+                            float[][] output = modelManager.run(data);
+                            for(int i=0; i<10; i++){
+                                Log.i("Model outputs", ""+i+output[0][i]);
                             }
-                            System.out.println("<<<<<>>>>>");
-
-
+//                            class ID:
+//                            0 - air_conditioner
+//                            1 - car_horn
+//                            2 - children_playing
+//                            3 - dog_bark
+//                            4 - drilling
+//                            5 - engine_idling
+//                            6 - gun_shot
+//                            7 - jackhammer
+//                            8 - siren
+//                            9 - street_music
+                            if(output[0][1] > 0.3){
+                                vibrator.vibrate(500);
+                            }
                             binding.testText.setText(
-                                    "5초 단위 mfcc 값 "+ new SimpleDateFormat("HH시mm분ss초").format(new Date())+"\n"+data[0][0]
+                                    "0: "+output[0][0] + "  1: "+output[0][1] +"\n" +
+                                    "2: "+output[0][2] + "  1: "+output[0][3] +"\n" +
+                                    "4: "+output[0][4] + "  1: "+output[0][5] +"\n" +
+                                    "6: "+output[0][6] + "  1: "+output[0][7] +"\n" +
+                                    "8: "+output[0][8] + "  1: "+output[0][9] +"\n"
                             );
                             repeatRecord(duration);
                         } catch (IOException e) {

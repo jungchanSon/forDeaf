@@ -1,4 +1,6 @@
-package com.example.myapplication.audioManager;
+package com.example.myapplication.manager;
+
+import android.util.Log;
 
 import com.example.myapplication.jLibrosa.audio.JLibrosa;
 import com.example.myapplication.jLibrosa.audio.exception.FileFormatNotSupportedException;
@@ -11,8 +13,8 @@ public class MFCCManager {
     private ArrayList<float[][]> mfccList = new ArrayList<>();
     private JLibrosa jLibrosa = new JLibrosa();
 
-    private int sampleRate = -1;
-    private int duration = -1;
+    private int sampleRate = 22050;
+    private int duration = 1;
     private int samplerate = jLibrosa.getSampleRate();
 
     public MFCCManager(){
@@ -68,7 +70,28 @@ public class MFCCManager {
         return null;
     }
 
+    public float[][][] popMFCC3D(){
+        if(!this.mfccList.isEmpty()){
+            Log.d("mfcc", "START pop MFCC for 3d");
 
+            float[][][] temp = new float[1][40][22];
+            float[][] mfccValues = this.mfccList.remove(0);
+            System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
+
+            for(int i=0; i<40; i++){
+                for(int j=0; j<22; j++){
+                    if(j < mfccValues[0].length)
+                        temp[0][i][j] = mfccValues[i][j];
+                    else
+                        temp[0][i][j] = 0;
+                }
+            }
+            Log.d("mfcc", "END pop MFCC for 3d ");
+            return temp;
+        }
+        Log.e("mfcc", "FAIL pop mfcc for 3d");
+        return null;
+    }
 
     @Override
     public String toString() {

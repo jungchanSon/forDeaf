@@ -1,4 +1,4 @@
-package com.example.myapplication.audioManager;// wav 변환.
+package com.example.myapplication.manager;// wav 변환.
 // 출처 : https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=oaie&logNo=221225216375
 import java.io.File;
 import java.io.IOException;

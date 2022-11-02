@@ -30,10 +30,17 @@ public class JLibrosa {
 	private int sampleRate = -1;
 	private int noOfChannels = -1;
 
+//  원본
+//	private double fMax = 44100 / 2.0;
+//	private double fMin = 0.0;
+//	private int n_fft = 2048;
+//	private int hop_length = 512;
+//	private int n_mels = 128;
+
 	private double fMax = 44100 / 2.0;
 	private double fMin = 0.0;
-	private int n_fft = 2048;
-	private int hop_length = 512;
+	private int n_fft = 4096;
+	private int hop_length = 1024;
 	private int n_mels = 128;
 
 	

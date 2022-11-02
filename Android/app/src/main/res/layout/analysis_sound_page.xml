@@ -54,7 +54,19 @@
     </LinearLayout>
 
 <!--    테스트 버튼-->
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
 
+        android:layout_marginRight="150dp"
+        android:layout_marginBottom="150dp"
+        android:text="중지 →"
+        android:textSize="20dp"
+        android:background="@drawable/round_button"
+        />
     <Button
         android:id="@+id/btnPrev"
         android:layout_width="wrap_content"
@@ -68,7 +80,7 @@
         android:textSize="20dp"
         android:background="@drawable/round_button"/>
     <Button
-        android:id="@+id/btnStop"
+        android:id="@+id/btnNext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -76,7 +88,7 @@
 
         android:layout_marginRight="40dp"
         android:layout_marginBottom="40dp"
-        android:text="중지 →"
+        android:text="다음 →"
         android:textSize="20dp"
         android:background="@drawable/round_button"/>
 </RelativeLayout>
