@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import static org.apache.commons.math3.util.Precision.round;
+
 import android.content.Context;
 
 import android.os.Bundle;
@@ -24,14 +26,26 @@ public class AnalysisSoundFragment extends Fragment{
 
     private AnalysisSoundPageBinding binding;
     private Vibrator vibrator;
-
-
-    private MFCCManager mfccManager;
-    private int audioDuration;
-    private boolean isRecord;
     private Handler handler;
 
+    private MFCCManager mfccManager;
+    private ModelManager modelManager;
     private RecordManager recordManager;
+
+    private int audioDuration = 1000;
+    private boolean isRecord = true;
+    private String[] labels_test = {
+            "air_conditioner",
+            "car_horn",
+            "children_playing",
+            "dog_bark",
+            "drilling",
+            "engine_idling",
+            "gun_shot",
+            "jackhammer",
+            "siren",
+            "street_music"
+    };
 
     @Override
     public View onCreateView(
@@ -41,23 +55,23 @@ public class AnalysisSoundFragment extends Fragment{
 
             handler = new Handler();
             binding = AnalysisSoundPageBinding.inflate(inflater, container, false);
-            audioDuration = 1000;
-
-
-
-            return binding.getRoot();
-    }
-
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
         vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         mfccManager = new MFCCManager();
         recordManager = new RecordManager(getActivity());
 
-//        오디오 녹음 시작
-        isRecord = true;
-        //위 테스트 끝나면 주석 풀기!
+        //Apk 할때
+//      String model_path = "file:///android_asset/fordeaf.tflite";
+        String model_path = getActivity().getExternalFilesDir("/").getAbsolutePath() + "/" + "fordeaf.tflite";
+        modelManager = new ModelManager(model_path);
+
+        return binding.getRoot();
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
         repeatRecord(audioDuration);
 
         binding.btnStop.setOnClickListener(new View.OnClickListener() {
@@ -120,43 +134,31 @@ public class AnalysisSoundFragment extends Fragment{
                 public void run() {
                     if(isRecord){
                         try {
-//                            String model_path = "file:///android_asset/fordeaf.tflite";
                             recordManager.stopRecord();
+
+                            //테스트용
                             String audioFileName = recordManager.getAudioFileName();
                             mfccManager.addMFCC(audioFileName);
 
                             float [][][] mfcc3d = mfccManager.popMFCC3D();
                             Log.d("pop MFCC", "run: popMFCC3D() -> " + mfcc3d);
 
-                            String model_path = getActivity().getExternalFilesDir("/").getAbsolutePath() + "/" + "fordeaf.tflite";
-                            ModelManager modelManager = new ModelManager(model_path);
 
                             float[][] output = modelManager.run(mfcc3d);
                             for(int i=0; i<10; i++){
                                 Log.i("Model outputs", ""+i+output[0][i]);
                             }
-//                            class ID:
-//                            0 - air_conditioner
-//                            1 - car_horn
-//                            2 - children_playing
-//                            3 - dog_bark
-//                            4 - drilling
-//                            5 - engine_idling
-//                            6 - gun_shot
-//                            7 - jackhammer
-//                            8 - siren
-//                            9 - street_music
+
                             if(output[0][1] > 0.3){
                                 vibrator.vibrate(500);
                             }
                             binding.testText.setText(
-                                    "0: "+output[0][0] + "  1: "+output[0][1] +"\n" +
-                                    "2: "+output[0][2] + "  1: "+output[0][3] +"\n" +
-                                    "4: "+output[0][4] + "  1: "+output[0][5] +"\n" +
-                                    "6: "+output[0][6] + "  1: "+output[0][7] +"\n" +
-                                    "8: "+output[0][8] + "  1: "+output[0][9] +"\n"
+                                    labels_test[0]+": "+round(output[0][0], 3) + labels_test[1]+"   : "+round(output[0][1], 3) +"\n" +
+                                    labels_test[2]+": "+round(output[0][2], 3) + labels_test[3]+"   : "+round(output[0][3], 3) +"\n" +
+                                    labels_test[4]+": "+round(output[0][4], 3) + labels_test[5]+"   : "+round(output[0][5], 3) +"\n" +
+                                    labels_test[6]+": "+round(output[0][6], 3) + labels_test[7]+"   : "+round(output[0][7], 3) +"\n" +
+                                    labels_test[8]+": "+round(output[0][8], 3) + labels_test[9]+"   : "+round(output[0][9], 3) +"\n"
                             );
-                            System.out.println("aasdasdadssasasasasadsa");
                             repeatRecord(duration);
                         } catch (IOException e) {
                             e.printStackTrace();

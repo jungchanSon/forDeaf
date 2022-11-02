@@ -32,7 +32,7 @@ public class RecordManager extends Fragment {
                 MediaRecorder.AudioSource.MIC,
                 AudioFormat.ENCODING_PCM_16BIT,
                 AudioFormat.CHANNEL_IN_MONO,
-                44100
+                44100/2
         );
 
 
