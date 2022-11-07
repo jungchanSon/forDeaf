@@ -12,8 +12,11 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from keras.utils import to_categorical
 
-def testing(model_path,path_pkl):
-    eva,test_pre,test_predicted = model_evaluate(model_path, path_pkl)
+def testing(model_path,path_pkl,model_type:str):
+    if str == "tensorflow":
+        eva,test_pre,test_predicted = model_evaluate(model_path, path_pkl)
+    elif str == "tflite":
+        eva,test_pre,test_predicted = model_evaluate_tflite(model_path, path_pkl)
     print(eva)
     
     return test_pre,test_predicted
@@ -37,6 +40,26 @@ def model_evaluate(model_path,path_pkl):
     
     return model.evaluate(X,y),test_pre,test_predicted
     
+def model_evaluate_tflite(model_path, path_pkl):
+    interpreter = tf.lite.Interpreter(model_path)
+    interpreter.allocate_tensors()
+    
+    feature_df = pd.read_pickle(path_pkl)
+    
+    X = np.array(feature_df.mfccs.tolist())
+    
+    input_details = interpreter.get_input_details()
+    interpreter.set_tensor(input_details[0]['index'],X)
+    interpreter.invoke()
+    
+    output_details = interpreter.get_output_details()
+    
+    test_pre = interpreter.get_tensor(output_details[0]['index'])
+    test_predicted = test_pre[0][test_pre.argmax()]
+    
+    return test_pre,test_predicted
+    
+    
 '''
 0 – aircon
 1 – car_horn
@@ -55,9 +78,15 @@ def model_evaluate(model_path,path_pkl):
 '''
 
 #모델경로와 데이터파일(pkl) 파일 경로 수정 필요
-model_path = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/test'
-path_pic = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/val_feature_df.pkl'
-test_pre,test_predicted = testing(model_path,path_pic)
+model_path = 'C:/git/forDeaf/AI/Model/For_Deaf_0.3'
+tflite_model_path = 'C:/git/forDeaf/AI/Model/For_Deaf_0.5_withmetadata.tflite'
+path_pic = 'C:/git/forDeaf/AI/dataset/val_feature_df.pkl'
+
+#tensorflow 모델 테스트
+#test_pre,test_predicted = testing(model_path,path_pic,"tensorflow")
+
+#tensorflow lite 모델 테스트
+test_pre,test_predicted = testing(model_path,path_pic,"tflite")
 
 res = np.zeros([792,2])
 for idx, per in enumerate(test_predicted):
