@@ -13,9 +13,9 @@ import os
 import matplotlib.pyplot as plt
 
 #file_name에 해당하는 파일의 mfccs를 생성,리턴
-#state = 0 -> use trim_audio
-#state = 1 -> use stretching_audio
-#state = 2 -> use shiftinf_audio
+#state = 'trim' -> use trim_audio
+#state = 'stretching' -> use stretching_audio
+#state = 'addnoise' -> use shifting_audio
 def make_mfccs(file_name,state:str):
     max_pad_len = 173
     time = 1
@@ -34,7 +34,7 @@ def make_mfccs(file_name,state:str):
     if state == 'trim':
         audio = trim_audio(audio,sr,time)
     #original audio 'Time' 초로 stretching
-    elif state == 'stretcing':
+    elif state == 'stretching':
         audio = stretching_audio(audio,sr,time)
     #trim audio shifting
     elif state == 'shifting':
@@ -134,12 +134,11 @@ def make_dataframe(file_path_audio,file_path_csv):
     val_features = []
     car_horn=0
     siren=0
+    other=0
     augmentation_data1 = 0
     augmentation_data2 = 0
     augmentation_data3 = 0
-    other=0
-    
-    
+   
     #폴더 1~10까지 반복
     for i in range(1,10):
         print("----------",i,"/10","----------")
@@ -169,7 +168,7 @@ def make_dataframe(file_path_audio,file_path_csv):
             data = make_mfccs(audio_file,'trim')
             if label!=2:
                 #data augmentation1(stretching)
-                stretching_data = make_mfccs(audio_file,'stretcing')
+                stretching_data = make_mfccs(audio_file,'stretching')
                 augmentation_data1+=1
                 #data augmentation2(shifting)
                 shifting_data = make_mfccs(audio_file,'shifting')
@@ -187,6 +186,7 @@ def make_dataframe(file_path_audio,file_path_csv):
                     val_features.append([shifting_data,label])
                     val_features.append([addnoise_data,label])
                 print("val_features = ",len(val_features))
+                print("")
             else:
                 features.append([data,class_label])
                 if label!=2:
@@ -211,12 +211,12 @@ def make_dataframe(file_path_audio,file_path_csv):
     print("siren(label 1) = ", siren)
     print("other(label 2) = ", other)
     print("----------Augmentation data 갯수----------")
-    print("stretching_data(aug1) = " + augmentation_data1)
-    print("shifting_data(aug2) = " + augmentation_data2)
-    print("addnoise_data(aug3) = " + augmentation_data3)
+    print("stretching_data(aug1) = ",augmentation_data1)
+    print("shifting_data(aug2) = ",augmentation_data2)
+    print("addnoise_data(aug3) = ",augmentation_data3)
     print("----------Train_data, Validation_data 갯수----------")
-    print("val_feature = " + len(val_features))
-    print("feature = " + len(features))
+    print("val_feature = ",len(val_features))
+    print("feature = ",len(features))
     
     return
 
