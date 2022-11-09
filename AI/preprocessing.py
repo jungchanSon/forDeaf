@@ -10,17 +10,43 @@ import librosa.display
 import pandas as pd
 import numpy as np
 import os
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 #file_name에 해당하는 파일의 mfccs를 생성,리턴
-def make_mfccs(file_name):
+#state = 0 -> use trim_audio
+#state = 1 -> use stretching_audio
+#state = 2 -> use shiftinf_audio
+def make_mfccs(file_name,state:str):
     max_pad_len = 173
     time = 1
+    term = 0.5
+    noise = 10
     audio,sr = librosa.load(file_name) #sr = 22050/s
+    
+    #------------------------------------------------------
+    #   wave 확인용 코드
+    #   librosa.display.waveshow(audio,sr=sr)
+    #   plt.show()
+    #------------------------------------------------------
     
     #원본 신호 time초로 trim(최대 peak기준)
     #audio(파형), sr(sampling rate), Time(초) 을 인자로 받음
-    audio = trim_audio(audio,sr,time)
+    if state == 'trim':
+        audio = trim_audio(audio,sr,time)
+    #original audio 'Time' 초로 stretching
+    elif state == 'stretcing':
+        audio = stretching_audio(audio,sr,time)
+    #trim audio shifting
+    elif state == 'shifting':
+        audio = trim_audio(audio,sr,time)
+        audio = shifting_audio(audio,term)
+    #add whitenoise in trim audio
+    elif state == 'addnoise':
+        audio = trim_audio(audio,sr,time)
+        audio = addnoise_audio(audio,noise)
+    else:
+        print("state type ERROR")
+        return
     
     '''
     D = np.abs(librosa.stft(audio, n_fft=4096, win_length=4096, hop_length=1024))
@@ -36,7 +62,7 @@ def make_mfccs(file_name):
     
     #1초 미만인 mfcc에 대하여 zero padding
     pad_width = max_pad_len - mfcc.shape[1]
-    mfcc = np.pad(mfcc,pad_width = ((0,0),(0,pad_width)),mode = 'constant')
+    mfcc = np.pad(mfcc,pad_width = ((0,0),(0,pad_width)),mode = 'constant')    
         
     return mfcc
 
@@ -72,6 +98,29 @@ def trim_audio(audio,sr,time):
     '''
     return trim_audio
 
+#original audio stretching to time
+def stretching_audio(audio,sr,time):
+    str_time = len(audio) / sr*time
+    str_audio = librosa.effects.time_stretch(audio,rate=str_time)
+    
+    return str_audio
+    
+#term 만큼 잘라서 shifting
+def shifting_audio(audio,term):
+    audio1 = audio[0:round(len(audio)*term)]
+    audio2 = audio[round(len(audio)*term):-1]
+    shifting_audio = np.concatenate((audio2,audio1),axis=0)
+    
+    return shifting_audio
+    
+#trim audio 에 white_noise 추가
+def addnoise_audio(audio,noise_num):
+    for i,data in enumerate(audio):
+        r_number = np.random.normal() * noise_num
+        audio[i]+=r_number
+        
+    return audio
+
 #mfccs와 class label을 가진 pkl파일 생성, 저장
 def make_dataframe(file_path_audio,file_path_csv):
     fold_num = 1
@@ -85,6 +134,9 @@ def make_dataframe(file_path_audio,file_path_csv):
     val_features = []
     car_horn=0
     siren=0
+    augmentation_data1 = 0
+    augmentation_data2 = 0
+    augmentation_data3 = 0
     other=0
     
     
@@ -112,15 +164,37 @@ def make_dataframe(file_path_audio,file_path_csv):
                         other+=1
                         
                     class_label = label
-                    
-            data = make_mfccs(audio_file)
+            
+            #data augmentation0(trim)
+            data = make_mfccs(audio_file,'trim')
+            if label!=2:
+                #data augmentation1(stretching)
+                stretching_data = make_mfccs(audio_file,'stretcing')
+                augmentation_data1+=1
+                #data augmentation2(shifting)
+                shifting_data = make_mfccs(audio_file,'shifting')
+                augmentation_data2+=1
+                #data augmentation3(addnoise)
+                addnoise_data = make_mfccs(audio_file,'addnoise')
+                augmentation_data3+=1
+                
             #각 폴더당 약 80개 추출하여 검증파일 생성
-            print(class_label)
+            print("class_label = ",class_label)
             if i % 10 == 0:
                 val_features.append([data,class_label])
-                print("val = ",len(val_features))
+                if label!=2:
+                    val_features.append([stretching_data,label])
+                    val_features.append([shifting_data,label])
+                    val_features.append([addnoise_data,label])
+                print("val_features = ",len(val_features))
             else:
                 features.append([data,class_label])
+                if label!=2:
+                    features.append([stretching_data,label])
+                    features.append([shifting_data,label])
+                    features.append([addnoise_data,label])
+                print("features = ",len(features))
+                print("")
             
         fold_num+=1
                     
@@ -132,9 +206,17 @@ def make_dataframe(file_path_audio,file_path_csv):
     
     print("val_feature_df.pkl 생성 완료")
     print("feature_df.pkl 생성 완료")
+    print("----------원본 데이터의 갯수(trim)----------")
     print("car_horn(label 0) = ", car_horn)
     print("siren(label 1) = ", siren)
     print("other(label 2) = ", other)
+    print("----------Augmentation data 갯수----------")
+    print("stretching_data(aug1) = " + augmentation_data1)
+    print("shifting_data(aug2) = " + augmentation_data2)
+    print("addnoise_data(aug3) = " + augmentation_data3)
+    print("----------Train_data, Validation_data 갯수----------")
+    print("val_feature = " + len(val_features))
+    print("feature = " + len(features))
     
     return
 
