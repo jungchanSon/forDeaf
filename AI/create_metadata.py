@@ -10,7 +10,7 @@ from tflite_support.metadata_writers import metadata_info
 from tflite_support.metadata_writers import writer_utils
 
 AudioClassifierWriter = audio_classifier.MetadataWriter
-_MODEL_PATH = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/For_Deaf_0.3.tflite'
+_MODEL_PATH = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/For_Deaf_0.5.tflite'
 # Task Library expects label files that are in the same format as the one below.
 _LABEL_FILE = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/For_Deaf_label.txt'
 # Expected sampling rate of the input audio buffer.
@@ -18,7 +18,7 @@ _SAMPLE_RATE = 22050
 # Expected number of channels of the input audio buffer. Note, Task library only
 # support single channel so far.
 _CHANNELS = 1
-_SAVE_TO_PATH = "For_Deaf_0.3_withmetadata.tflite"
+_SAVE_TO_PATH = "For_Deaf_0.5_withmetadata.tflite"
 
 # Create the metadata writer.
 writer = AudioClassifierWriter.create_for_inference(

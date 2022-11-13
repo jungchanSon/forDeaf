@@ -15,40 +15,34 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 #model 구조
-def make_model(n_columns,n_row,n_channels,n_classes):
+def make_model(n_columns,n_row,n_classes):
     model = keras.Sequential()
 
-    model.add(layers.Conv2D(input_shape=(n_row,n_columns,n_channels),filters=16,kernel_size=2,activation='relu'))
+    model.add(layers.InputLayer(input_shape=(n_row,n_columns,1)))
+    model.add(layers.Conv2D(filters=32,kernel_size=5,activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=2))
-    model.add(layers.Dropout(0.2))
+    model.add(layers.Dropout(0.3))
     
-    model.add(layers.Conv2D(kernel_size=2,filters=32,activation='relu'))
+    model.add(layers.Conv2D(kernel_size=5,filters=64,activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=2))
-    model.add(layers.Dropout(0.2))
+    model.add(layers.Dropout(0.3))
     
-    model.add(layers.Conv2D(kernel_size=2,filters=64,activation='relu'))
+    model.add(layers.Conv2D(kernel_size=5,filters=128,activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=2))
-    model.add(layers.Dropout(0.2))
-    
-    '''
-    model.add(layers.Conv2D(kernel_size=2,filters=128,activation='relu'))
-    model.add(layers.MaxPooling2D(pool_size=2))
-    model.add(layers.Dropout(0.2))
-    '''
+    model.add(layers.Dropout(0.3))
     
     model.add(layers.GlobalAveragePooling2D())
-    model.add(tf.keras.layers.Dense(units=10,activation='softmax'))
+    model.add(tf.keras.layers.Dense(units=n_classes,activation='softmax'))
     return model
 
 #모델 수정 후 모델 구조 확인
 def show_model():
     ###mfccs 구조
-    n_columns = 22
+    n_columns = 173
     n_row = 40
-    n_channels = 1
     n_classes = 10
     
-    model = make_model(n_columns,n_row,n_channels,n_classes)
+    model = make_model(n_columns,n_row,n_classes)
     model.summary()
     return
 
@@ -66,25 +60,24 @@ def train(path_pkl):
     x_train,x_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state = 42)
 
     ###mfccs 구조
-    n_columns = 22
+    n_columns = 173
     n_row = 40
-    n_channels = 1
-    n_classes = 10
+    n_classes = 3
 
     with tf.device('/cpu:0'):
-        x_train = tf.reshape(x_train,[-1,n_row,n_columns,n_channels])
-        x_test = tf.reshape(x_test,[-1,n_row,n_columns,n_channels])
+        x_train = tf.reshape(x_train,[-1,n_row,n_columns])
+        x_test = tf.reshape(x_test,[-1,n_row,n_columns])
     
     print(x_train.shape)
     print(x_test.shape)
     
-    model = make_model(n_columns,n_row,n_channels,n_classes)
+    model = make_model(n_columns,n_row,n_classes)
     model.summary()
 
     ###하이퍼 파라미터
     ###epoch, batch_size, lr, opt, loss function
-    ###15, 64, 0.001, Adam, categorical_crossentropy
-    epoch = 50
+    ###50, 64, 0.001, Adam, categorical_crossentropy
+    epoch = 5
     batch_size = 64
     learning_rate = 0.001
     opt = keras.optimizers.Adam(learning_rate=learning_rate)

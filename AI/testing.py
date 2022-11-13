@@ -12,8 +12,11 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from keras.utils import to_categorical
 
-def testing(model_path,path_pkl):
-    eva,test_pre,test_predicted = model_evaluate(model_path, path_pkl)
+def testing(model_path,path_pkl,model_type:str):
+    if str == "tensorflow":
+        eva,test_pre,test_predicted = model_evaluate(model_path, path_pkl)
+    elif str == "tflite":
+        eva,test_pre,test_predicted = model_evaluate_tflite(model_path, path_pkl)
     print(eva)
     
     return test_pre,test_predicted
@@ -22,24 +25,40 @@ def model_evaluate(model_path,path_pkl):
     #path_pic = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl'
     model = keras.models.load_model(model_path)
     feature_df = pd.read_pickle(path_pkl)
-
+    
+    #print(feature_df['class_label'].value_counts())
+    
+    print(feature_df.shape)
+    
     X = np.array(feature_df.mfccs.tolist())
     y = np.array(feature_df.class_label.tolist())
     y = to_categorical(LabelEncoder().fit_transform(y))
-
-    #모델 구조 변경할 수도.
-    n_columns = 22
-    n_row = 40
-    n_channels = 1
-    n_classes = 10
-
-    with tf.device('/cpu:0'):
-        X = tf.reshape(X,[-1,n_row,n_columns,n_channels])
-        
+    
+    print(X.shape)
     test_pre = model.predict(X,verbose=0)
     test_predicted = test_pre.argmax(axis=-1)
     
     return model.evaluate(X,y),test_pre,test_predicted
+    
+def model_evaluate_tflite(model_path, path_pkl):
+    interpreter = tf.lite.Interpreter(model_path)
+    interpreter.allocate_tensors()
+    
+    feature_df = pd.read_pickle(path_pkl)
+    
+    X = np.array(feature_df.mfccs.tolist())
+    
+    input_details = interpreter.get_input_details()
+    interpreter.set_tensor(input_details[0]['index'],X)
+    interpreter.invoke()
+    
+    output_details = interpreter.get_output_details()
+    
+    test_pre = interpreter.get_tensor(output_details[0]['index'])
+    test_predicted = test_pre[0][test_pre.argmax()]
+    
+    return test_pre,test_predicted
+    
     
 '''
 0 – aircon
@@ -52,16 +71,22 @@ def model_evaluate(model_path,path_pkl):
 7 – jackhammer
 8 – siren
 9 – street_music
+||||| 위에서 아래로 변환함
+0 - car_horn
+1 - siren
+2 - other
 '''
 
 #모델경로와 데이터파일(pkl) 파일 경로 수정 필요
+model_path = 'C:/git/forDeaf/AI/Model/For_Deaf_0.3'
+tflite_model_path = 'C:/git/forDeaf/AI/Model/For_Deaf_0.5_withmetadata.tflite'
+path_pic = 'C:/git/forDeaf/AI/dataset/val_feature_df.pkl'
 
-##추가할 사항
-## 검증용 pkl파일 생성후 로드하여 정확도 테스트
+#tensorflow 모델 테스트
+#test_pre,test_predicted = testing(model_path,path_pic,"tensorflow")
 
-model_path = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/For_Deaf_0.1'
-path_pic = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/val_feature_df.pkl'
-test_pre,test_predicted = testing(model_path,path_pic)
+#tensorflow lite 모델 테스트
+test_pre,test_predicted = testing(model_path,path_pic,"tflite")
 
 res = np.zeros([792,2])
 for idx, per in enumerate(test_predicted):
