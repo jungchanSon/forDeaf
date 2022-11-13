@@ -39,8 +39,8 @@ public class JLibrosa {
 
 	private double fMax = 44100 / 2.0;
 	private double fMin = 0.0;
-	private int n_fft = 4096;
-	private int hop_length = 1024;
+	private int n_fft = 512;
+	private int hop_length = 128;
 	private int n_mels = 128;
 
 	
