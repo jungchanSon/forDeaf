@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -44,7 +45,8 @@ public class AnalysisSoundFragment extends Fragment{
     private BluetoothDevice bluetoothDevice;
     private Set<BluetoothDevice> devices;
     private BluetoothGatt socket;
-    private BluetoothGattCharacteristic pwmChar;
+    private BluetoothGattCharacteristic pwmChar = null;
+    private BluetoothGattCharacteristic pwmChar1 = null;
     private MFCCManager mfccManager;
     private ModelManager modelManager;
     private RecordManager recordManager;
@@ -53,11 +55,16 @@ public class AnalysisSoundFragment extends Fragment{
     private boolean isRecord = true;
     String model_path = "model.tflite";
 
+    private double threshhold_low = 0.3;
+    private double threshhold_high = 0.5;
+
     private String[] labels_test = {
             "car_horn",
             "siren",
             "Other"
     };
+
+
 
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
@@ -83,14 +90,31 @@ public class AnalysisSoundFragment extends Fragment{
                 BluetoothGattService bluetoothGattService = services.get(4);
 
                 List<BluetoothGattCharacteristic> characteristics = bluetoothGattService.getCharacteristics();
-                pwmChar= characteristics.get(2);
 
-                bluevib(gatt, (byte) 200);
+                //처음 시작시, 확인용 진동
+                if(characteristics.get(2) != null){
+                    pwmChar= characteristics.get(2);
+
+                    bluevib(gatt, (byte)100);
+                }
+                if(characteristics.get(3) != null){
+                    pwmChar1= characteristics.get(3);
+
+                    bluevib1(gatt, (byte)100);
+                }
+
+
 
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        bluevib(gatt, (byte) 0);
+                        byte[] data = new byte[1];
+                        data[0] = (byte)0;
+
+                        pwmChar.setValue(data);
+                        gatt.writeCharacteristic(pwmChar);
+                        pwmChar1.setValue(data);
+                        gatt.writeCharacteristic(pwmChar1);
                     }
                 }, 500);
 
@@ -141,6 +165,13 @@ public class AnalysisSoundFragment extends Fragment{
 
         pwmChar.setValue(data);
         gatt.writeCharacteristic(pwmChar);
+    }
+    private void bluevib1(BluetoothGatt gatt, byte i) {
+        byte[] data = new byte[1];
+        data[0] = i;
+
+        pwmChar1.setValue(data);
+        gatt.writeCharacteristic(pwmChar1);
     }
 
     @Override
@@ -203,7 +234,41 @@ public class AnalysisSoundFragment extends Fragment{
 
 
         repeatRecord(audioDuration);
+        binding.lowBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.lowText.setText("약한 임계점 : " + seekBar.getProgress());
+                threshhold_low = (double)seekBar.getProgress()/10.0;
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        binding.highBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.highText.setText("강한 임계점 : " + seekBar.getProgress());
+                threshhold_high = (double)seekBar.getProgress()/10.0;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         binding.btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -282,18 +347,173 @@ public class AnalysisSoundFragment extends Fragment{
                                 Log.i("Model outputs", ""+i+output[0][i]);
                             }
 
-                            if(output[0][1] > 0.3 || output[0][0] > 0.3){
+                            if(output[0][0] > threshhold_high){
                                 vibrator.vibrate(500);
-                                bluevib(socket, (byte) 200);
+
+                                if(pwmChar != null){
+                                    bluevib(socket, (byte) 200);
+
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib(socket, (byte) 0);
+                                        }
+                                    }, 500);
+                                }
+                                if(pwmChar1 != null){
+                                    bluevib1(socket, (byte) 200);
+
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib1(socket, (byte) 0);
+                                        }
+                                    }, 500);
+                                }
+                            }
+                            else if(output[0][0] > threshhold_low){
+                                vibrator.vibrate(300);
+
+                                if(pwmChar != null){
+                                    bluevib(socket, (byte) 100);
+
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib(socket, (byte) 0);
+                                        }
+                                    }, 500);
+                                }
+                                if(pwmChar1 != null){
+                                    bluevib1(socket, (byte) 100);
+
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib1(socket, (byte) 0);
+                                        }
+                                    }, 500);
+                                }
+                            }
+                            else if(output[0][1] > threshhold_high){
+                                vibrator.vibrate(500);
 
                                 handler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        bluevib(socket, (byte) 0);
+                                        vibrator.vibrate(500);
                                     }
+
+                                }, 700);
+
+                                if(pwmChar != null){
+                                    bluevib(socket, (byte) 200);
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib(socket, (byte) 0);
+                                        }
+
+                                    }, 300);
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib(socket, (byte) 200);
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    bluevib(socket, (byte) 0);
+                                                }
+
+                                            }, 300);
+                                        }
+                                    }, 600);
+                                }
+                                if(pwmChar1 != null){
+                                    bluevib1(socket, (byte) 200);
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib1(socket, (byte) 0);
+                                        }
+
+                                    }, 300);
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib1(socket, (byte) 200);
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    bluevib1(socket, (byte) 0);
+                                                }
+
+                                            }, 300);
+                                        }
+                                    }, 600);
+                                }
+                            }
+
+                            else if(output[0][1] > threshhold_low){
+                                vibrator.vibrate(300);
+
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        vibrator.vibrate(300);
+                                    }
+
                                 }, 500);
 
+                                if(pwmChar != null){
+                                    bluevib(socket, (byte) 100);
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib(socket, (byte) 0);
+                                        }
+
+                                    }, 300);
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib(socket, (byte) 100);
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    bluevib(socket, (byte) 0);
+                                                }
+
+                                            }, 300);
+                                        }
+                                    }, 600);
+                                }
+                                if(pwmChar1 != null){
+                                    bluevib1(socket, (byte) 100);
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib1(socket, (byte) 0);
+                                        }
+
+                                    }, 300);
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bluevib1(socket, (byte) 100);
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    bluevib1(socket, (byte) 0);
+                                                }
+
+                                            }, 300);
+                                        }
+                                    }, 600);
+                                }
                             }
+
+
                             binding.testText.setText(
                                     labels_test[0]+": "+round(output[0][0], 3)+"\n" + labels_test[1]+"   : "+round(output[0][1], 3) +"\n" +
                                     labels_test[2]+": "+round(output[0][2], 3)
