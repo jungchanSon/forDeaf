@@ -24,9 +24,10 @@ public class ModelManager {
         this.interpreter = new Interpreter(tflite_mdoel);
     }
 
-    public float[][] run(float[][][] mfcc){
-        float[][] outputs = new float[1][10];
+    public float[][] run(float[][][][] mfcc){
+        float[][] outputs = new float[1][3];
         this.interpreter.allocateTensors();
+//        float temp[][][][] = new float[1][40][173][1];
         interpreter.run(mfcc, outputs);
 
         return outputs;

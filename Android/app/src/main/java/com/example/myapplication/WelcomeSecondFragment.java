@@ -11,13 +11,17 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.myapplication.databinding.WelcomePageSecondBinding;
 
+
 public class WelcomeSecondFragment extends Fragment {
 
     private WelcomePageSecondBinding binding;
 
+
+
+
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
+            @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
 
@@ -29,14 +33,9 @@ public class WelcomeSecondFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 버튼 터치 -> 소리 체크 페이지
-        binding.btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(WelcomeSecondFragment.this)
-                        .navigate(R.id.action_WelcomePageSecond_to_SoundCheckPage);
-            }
-        });
+
+        binding.btnNext.setOnClickListener(view1 -> NavHostFragment.findNavController(WelcomeSecondFragment.this)
+                .navigate(R.id.action_WelcomePageSecond_to_SoundCheckPage));
     }
 
     @Override
@@ -44,5 +43,9 @@ public class WelcomeSecondFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+
+
+
 
 }

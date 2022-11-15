@@ -14,8 +14,7 @@ public class MFCCManager {
     private JLibrosa jLibrosa = new JLibrosa();
 
     private int sampleRate = 22050;
-    private int duration = 1;
-    private int samplerate = jLibrosa.getSampleRate();
+    private int duration = 1000;
 
     public MFCCManager(){
     }
@@ -70,20 +69,20 @@ public class MFCCManager {
         return null;
     }
 
-    public float[][][] popMFCC3D(){
+    public float[][][][] popMFCC3D(){
         if(!this.mfccList.isEmpty()){
             Log.d("mfcc", "START pop MFCC for 3d");
 
-            float[][][] temp = new float[1][40][22];
+            float[][][][] temp = new float[1][40][173][1];
             float[][] mfccValues = this.mfccList.remove(0);
             System.out.println("Size of MFCC Feature Values: (" + mfccValues.length + " , " + mfccValues[0].length + " )");
-
             for(int i=0; i<40; i++){
-                for(int j=0; j<22; j++){
-                    if(j < mfccValues[0].length)
-                        temp[0][i][j] = mfccValues[i][j];
-                    else
-                        temp[0][i][j] = 0;
+                for(int j=0; j<173; j++){
+                    if(j < mfccValues[i].length) {
+                        temp[0][i][j][0] = mfccValues[i][j];
+                    } else {
+                        temp[0][i][j][0] = 0;
+                    }
                 }
             }
             Log.d("mfcc", "END pop MFCC for 3d ");
