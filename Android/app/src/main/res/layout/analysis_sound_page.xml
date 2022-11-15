@@ -13,7 +13,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="175dp"
         android:layout_marginTop="10dp"
-        android:text="약한 임계점 0.3"></TextView>
+        android:text="약한 임계점 0.4"></TextView>
 
     <SeekBar
         android:id="@+id/low_bar"
@@ -23,31 +23,11 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="41dp"
         android:layout_marginEnd="64dp"
-        android:max="4"
-        android:min="1"
-        android:progress="3"
+        android:max="9"
+        android:min="0"
+        android:progress="4"
         ></SeekBar>
 
-    <TextView
-        android:id="@+id/high_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="75dp"
-        android:layout_marginEnd="175dp"
-        android:text="강한 임계점 0.5"></TextView>
-
-    <SeekBar
-        android:id="@+id/high_bar"
-        android:layout_width="300dp"
-        android:layout_height="30dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="100dp"
-        android:layout_marginEnd="64dp"
-        android:max="10"
-        android:min="4"
-        android:progress="5"></SeekBar>
 
     <LinearLayout
         android:id="@+id/analysisTextBox"

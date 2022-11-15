@@ -55,8 +55,8 @@ public class AnalysisSoundFragment extends Fragment{
     private boolean isRecord = true;
     String model_path = "model.tflite";
 
-    private double threshhold_low = 0.3;
-    private double threshhold_high = 0.5;
+    private double threshhold_low = 0.4;
+    private double threshhold_high = 0.9;
 
     private String[] labels_test = {
             "car_horn",
@@ -93,7 +93,7 @@ public class AnalysisSoundFragment extends Fragment{
 
                 //처음 시작시, 확인용 진동
 //                if(characteristics.get(2) != null){
-                pwmChar= characteristics.get(2);
+                pwmChar= characteristics.get(3);
                 bluevib(gatt, (byte)100);
 //                }
 //                if(characteristics.get(3) != null){
@@ -250,23 +250,7 @@ public class AnalysisSoundFragment extends Fragment{
             }
         });
 
-        binding.highBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                threshhold_high = (double)seekBar.getProgress()/10.0;
-                binding.highText.setText("강한 임계점 : " + threshhold_high);
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
         binding.btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -373,7 +357,7 @@ public class AnalysisSoundFragment extends Fragment{
                                 vibrator.vibrate(300);
 
                                 if(pwmChar != null){
-                                    bluevib(socket, (byte) 100);
+                                    bluevib(socket, (byte) 150);
 
                                     handler.postDelayed(new Runnable() {
                                         @Override
@@ -464,7 +448,7 @@ public class AnalysisSoundFragment extends Fragment{
                                 }, 500);
 
                                 if(pwmChar != null){
-                                    bluevib(socket, (byte) 100);
+                                    bluevib(socket, (byte) 150);
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
@@ -475,7 +459,7 @@ public class AnalysisSoundFragment extends Fragment{
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            bluevib(socket, (byte) 100);
+                                            bluevib(socket, (byte) 150);
                                             handler.postDelayed(new Runnable() {
                                                 @Override
                                                 public void run() {
@@ -513,13 +497,13 @@ public class AnalysisSoundFragment extends Fragment{
 
 
                             binding.testText.setText(
-                                    labels_test[0]+": "+round(output[0][0], 3)+"\n" + labels_test[1]+"   : "+round(output[0][1], 3) +"\n" +
+                                    output[0].length+labels_test[0]+": "+round(output[0][0], 3)+"\n" + labels_test[1]+"   : "+round(output[0][1], 3) +"\n" +
                                     labels_test[2]+": "+round(output[0][2], 3)
                             );
 
                             //test용
                             int maxI = 0;
-                            float maxV = output[0][1];
+                            float maxV = output[0][0];
 
                             for(int i=0; i<output[0].length; i++){
                                 if (maxV < output[0][i]){
@@ -535,7 +519,16 @@ public class AnalysisSoundFragment extends Fragment{
                             new File(audioFileName).delete();
                             Log.d("delete", "run: delete file");
 
-                            repeatRecord(duration);
+
+                            if(output[0][0] < threshhold_low && output[0][1] < threshhold_low)
+                                repeatRecord(duration);
+                            else
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        repeatRecord(duration);
+                                    }
+                                }, 2000);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
