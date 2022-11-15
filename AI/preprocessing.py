@@ -16,11 +16,11 @@ import matplotlib.pyplot as plt
 #state = 'trim' -> use trim_audio
 #state = 'stretching' -> use stretching_audio
 #state = 'addnoise' -> use shifting_audio
-def make_mfccs(file_name,state:str):
+def make_mfccs(file_name,state:str,trim_time=1,term_ratio=0.5,noise_power=10):
     max_pad_len = 173
-    time = 1
-    term = 0.5
-    noise = 10
+    time = trim_time
+    term = term_ratio
+    noise = noise_power
     audio,sr = librosa.load(file_name) #sr = 22050/s
     
     #------------------------------------------------------
@@ -35,15 +35,33 @@ def make_mfccs(file_name,state:str):
         audio = trim_audio(audio,sr,time)
     #original audio 'Time' 초로 stretching
     elif state == 'stretching':
+        # print("Before Stretching")
+        # librosa.display.waveshow(audio,sr=sr)
+        # plt.show()
         audio = stretching_audio(audio,sr,time)
+        # print("After Stretching")
+        # librosa.display.waveshow(audio,sr=sr)
+        # plt.show()
     #trim audio shifting
     elif state == 'shifting':
         audio = trim_audio(audio,sr,time)
+        # print("Before Shifting")
+        # librosa.display.waveshow(audio,sr=sr)
+        # plt.show()
         audio = shifting_audio(audio,term)
+        # print("After Shifting")
+        # librosa.display.waveshow(audio,sr=sr)
+        # plt.show()
     #add whitenoise in trim audio
     elif state == 'addnoise':
         audio = trim_audio(audio,sr,time)
+        # print("Before Addnoise")
+        # librosa.display.waveshow(audio,sr=sr)
+        # plt.show()
         audio = addnoise_audio(audio,noise)
+        # print("After Addnoise")
+        # librosa.display.waveshow(audio,sr=sr)
+        # plt.show()
     else:
         print("state type ERROR")
         return
@@ -100,6 +118,8 @@ def trim_audio(audio,sr,time):
 
 #original audio stretching to time
 def stretching_audio(audio,sr,time):
+    if len(audio)*sr > sr*4:
+        audio = trim_audio(audio,sr,4)
     str_time = len(audio) / sr*time
     str_audio = librosa.effects.time_stretch(audio,rate=str_time)
     
@@ -171,8 +191,11 @@ def make_dataframe(file_path_audio,file_path_csv):
                 stretching_data = make_mfccs(audio_file,'stretching')
                 augmentation_data1+=1
                 #data augmentation2(shifting)
-                shifting_data = make_mfccs(audio_file,'shifting')
-                augmentation_data2+=1
+                #0.2:0.8, 0.5:0.5, 0.8:0.2 ratio shifting
+                for i in range(2,9,3):
+                    shifting_data = make_mfccs(audio_file,'shifting',term_ratio=i*0.1)
+                    augmentation_data2+=1
+                    val_features.append([shifting_data,label])
                 #data augmentation3(addnoise)
                 addnoise_data = make_mfccs(audio_file,'addnoise')
                 augmentation_data3+=1
@@ -183,7 +206,6 @@ def make_dataframe(file_path_audio,file_path_csv):
                 val_features.append([data,class_label])
                 if label!=2:
                     val_features.append([stretching_data,label])
-                    val_features.append([shifting_data,label])
                     val_features.append([addnoise_data,label])
                 print("val_features = ",len(val_features))
                 print("")
@@ -219,6 +241,61 @@ def make_dataframe(file_path_audio,file_path_csv):
     print("feature = ",len(features))
     
     return
+
+#사용자 지정 데이터셋 추가함수, Augmentation 4가지 모두 적용(데이터 X 4)
+# class_type : car_horn, siren, other 입력
+# label은 class_type에 따라 자동 지정됨
+# file_type : concatenate, standalone 입력
+# concatenate - 기존의 feature_df.pkl 파일에 새로 만든 데이터를 이어붙임
+# standalone - 새로 만든 데이터만 따로 저장
+def generate_usermade_dataset(class_type:str,file_type:str):
+    path = 'C:/Users/User/Desktop/학교/전남대/캡스톤디자인/dataset/'
+    audio_path = path + class_type
+    file_list = os.listdir(audio_path)
+    file_list_wav = [file for file in file_list if file.endswith(".wav")]
+    features = []
+    
+    if class_type == "car_horn": class_label = 0
+    elif class_type == "siren":  class_label = 1
+    elif class_type == "other":  class_label = 2
+    
+    for i, file_name in enumerate(file_list_wav):
+        print(i," : ",file_name)
+        audio_file = audio_path + '/' + file_name
+        
+        #data augmentation0(trim)
+        trim_data = make_mfccs(audio_file,'trim')
+        #data augmentation1(stretching)
+        stretching_data = make_mfccs(audio_file,'stretching')
+        #data augmentation2(shifting)
+        #0.2:0.8, 0.5:0.5, 0.8:0.2 ratio shifting
+        for i in range(2,9,3):
+            print(i*0.1,":",1-(i*0.1)," ratio shifting")
+            shifting_data = make_mfccs(audio_file,'shifting',term_ratio=i*0.1)
+            features.append([shifting_data,class_label])
+        #data augmentation3(addnoise)
+        addnoise_data = make_mfccs(audio_file,'addnoise')
+        
+        features.append([trim_data,class_label])
+        features.append([stretching_data,class_label])
+        features.append([addnoise_data,class_label])
+        
+    feature_df = pd.DataFrame(features,columns = ['mfccs','class_label'])
+        
+    if file_type == "concatenate":
+        before_df = pd.read_pickle('C:/Users/User/Desktop/학교/전남대/캡스톤디자인/feature_df.pkl')
+        concatenate_df = pd.concat([before_df,feature_df], ignore_index=True)
+        concatenate_df.to_pickle("feature_df.pkl")
+        print("----------concatenate complete----------")
+        print("feature_df.pkl 생성 완료")
+    elif file_type == "standalone":
+        feature_df.to_pickle("usermade_dataset.pkl")
+        print("----------standalone complete----------")
+        print("usermade_dataset.pkl 생성 완료")
+        print("features = ",len(features))
+    
+    return
+
 
 #전처리 실행해주는 함수 -> 컴파일 후 콘솔에서 실행
 def pre_processing():

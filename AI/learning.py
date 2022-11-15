@@ -19,15 +19,15 @@ def make_model(n_columns,n_row,n_classes):
     model = keras.Sequential()
 
     model.add(layers.InputLayer(input_shape=(n_row,n_columns,1)))
-    model.add(layers.Conv2D(filters=32,kernel_size=5,activation='relu'))
+    model.add(layers.Conv2D(filters=32,kernel_size=3,activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=2))
     model.add(layers.Dropout(0.3))
     
-    model.add(layers.Conv2D(kernel_size=5,filters=64,activation='relu'))
+    model.add(layers.Conv2D(kernel_size=3,filters=64,activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=2))
     model.add(layers.Dropout(0.3))
     
-    model.add(layers.Conv2D(kernel_size=5,filters=128,activation='relu'))
+    model.add(layers.Conv2D(kernel_size=3,filters=128,activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=2))
     model.add(layers.Dropout(0.3))
     
@@ -76,9 +76,9 @@ def train(path_pkl):
 
     ###하이퍼 파라미터
     ###epoch, batch_size, lr, opt, loss function
-    ###50, 64, 0.001, Adam, categorical_crossentropy
-    epoch = 5
-    batch_size = 64
+    ###5, 128, 0.001, Adam, categorical_crossentropy
+    epoch = 10
+    batch_size = 128
     learning_rate = 0.001
     opt = keras.optimizers.Adam(learning_rate=learning_rate)
     
