@@ -55,7 +55,7 @@ def train(path_pkl):
     y = np.array(feature_df.class_label.tolist())
     #1~10 class label to categorical
     y = to_categorical(LabelEncoder().fit_transform(y))
-
+    
     #train_test_split, test_size = 0.2, random_state = 42
     x_train,x_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state = 42)
 
@@ -76,8 +76,8 @@ def train(path_pkl):
 
     ###하이퍼 파라미터
     ###epoch, batch_size, lr, opt, loss function
-    ###5, 128, 0.001, Adam, categorical_crossentropy
-    epoch = 10
+    ###6, 128, 0.001, Adam, categorical_crossentropy
+    epoch = 6
     batch_size = 128
     learning_rate = 0.001
     opt = keras.optimizers.Adam(learning_rate=learning_rate)
@@ -87,7 +87,7 @@ def train(path_pkl):
     print(' epoch = ',epoch,'\n','batch_size = ',batch_size,'\n', 'learning_rate = ',learning_rate,'\n', '학습 시작')
     history = model.fit(x_train,y_train,batch_size=batch_size,epochs=epoch)
     
-    results = model.evaluate(x_test, y_test, batch_size=64)
+    results = model.evaluate(x_test, y_test, batch_size=128)
     print('\n# Evaluate on test data')
     print('test loss, test acc:', results)
     return model,history
