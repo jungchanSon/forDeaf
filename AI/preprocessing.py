@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 #state = 'trim' -> use trim_audio
 #state = 'stretching' -> use stretching_audio
 #state = 'addnoise' -> use shifting_audio
-def make_mfccs(file_name,state:str,trim_time=1,term_ratio=0.5,noise_power=10):
+def make_mfccs(file_name,state:str,trim_time=1,term_ratio=0.5,noise_power=3):
     max_pad_len = 173
     time = trim_time
     term = term_ratio
@@ -55,13 +55,13 @@ def make_mfccs(file_name,state:str,trim_time=1,term_ratio=0.5,noise_power=10):
     #add whitenoise in trim audio
     elif state == 'addnoise':
         audio = trim_audio(audio,sr,time)
-        # print("Before Addnoise")
-        # librosa.display.waveshow(audio,sr=sr)
-        # plt.show()
+        print("Before Addnoise")
+        librosa.display.waveshow(audio,sr=sr)
+        plt.show()
         audio = addnoise_audio(audio,noise)
-        # print("After Addnoise")
-        # librosa.display.waveshow(audio,sr=sr)
-        # plt.show()
+        print("After Addnoise")
+        librosa.display.waveshow(audio,sr=sr)
+        plt.show()
     else:
         print("state type ERROR")
         return
@@ -118,7 +118,7 @@ def trim_audio(audio,sr,time):
 
 #original audio stretching to time
 def stretching_audio(audio,sr,time):
-    if len(audio)*sr > sr*4:
+    if len(audio) > sr*4:
         audio = trim_audio(audio,sr,4)
     str_time = len(audio) / sr*time
     str_audio = librosa.effects.time_stretch(audio,rate=str_time)
@@ -133,13 +133,48 @@ def shifting_audio(audio,term):
     
     return shifting_audio
     
-#trim audio 에 white_noise 추가
+#trim audio 에 noise 추가
 def addnoise_audio(audio,noise_num):
+    r_number = np.max(audio)/noise_num
     for i,data in enumerate(audio):
-        r_number = np.random.normal() * noise_num
-        audio[i]+=r_number
-        
+        if audio[i] > 0:
+            audio[i]+=r_number
+        else:
+            audio[i]-=r_number
+    
     return audio
+
+#path와 저장할 이름file name을 입력하면 해당 경로에있는 한가지 파일의
+#전처리 before, after .wav 파일 저장해줌
+def make_before_after_soundfile(path:str,filename:str):
+    audio,sr = librosa.load(path)
+    
+    import soundfile as sf
+    librosa.display.waveshow(audio,sr)
+    plt.show()
+    sf.write(filename+'_before.wav',audio,sr)
+    
+    tr_audio = trim_audio(audio,sr,1)
+    librosa.display.waveshow(tr_audio,sr)
+    plt.show()
+    sf.write(filename+'_trim.wav',tr_audio,sr)
+    
+    str_audio = stretching_audio(audio,sr,1)
+    librosa.display.waveshow(str_audio,sr)
+    plt.show()
+    sf.write(filename+'_str.wav',str_audio,sr)
+    
+    shift_audio = shifting_audio(tr_audio,0.5)
+    librosa.display.waveshow(shift_audio,sr)
+    plt.show()
+    sf.write(filename+'_shift.wav',shift_audio,sr)
+    
+    noise_audio = addnoise_audio(tr_audio,3)
+    librosa.display.waveshow(noise_audio,sr)
+    plt.show()
+    sf.write(filename+'_noise.wav',noise_audio,sr)
+
+    return
 
 #mfccs와 class label을 가진 pkl파일 생성, 저장
 def make_dataframe(file_path_audio,file_path_csv):
@@ -192,29 +227,34 @@ def make_dataframe(file_path_audio,file_path_csv):
                 augmentation_data1+=1
                 #data augmentation2(shifting)
                 #0.2:0.8, 0.5:0.5, 0.8:0.2 ratio shifting
-                for i in range(2,9,3):
-                    shifting_data = make_mfccs(audio_file,'shifting',term_ratio=i*0.1)
-                    augmentation_data2+=1
-                    val_features.append([shifting_data,label])
+                shifting_data1 = make_mfccs(audio_file,'shifting',term_ratio=0.2)
+                shifting_data2 = make_mfccs(audio_file,'shifting',term_ratio=0.5)
+                shifting_data3 = make_mfccs(audio_file,'shifting',term_ratio=0.8)
+                augmentation_data2+=3
                 #data augmentation3(addnoise)
-                addnoise_data = make_mfccs(audio_file,'addnoise')
-                augmentation_data3+=1
+                #addnoise_data = make_mfccs(audio_file,'addnoise')
+                #augmentation_data3+=1
                 
-            #각 폴더당 약 80개 추출하여 검증파일 생성
+            #약 10% 추출하여 검증파일 생성
             print("class_label = ",class_label)
             if i % 10 == 0:
                 val_features.append([data,class_label])
                 if label!=2:
-                    val_features.append([stretching_data,label])
-                    val_features.append([addnoise_data,label])
+                    val_features.append([stretching_data,class_label])
+                    val_features.append([shifting_data1,class_label])
+                    val_features.append([shifting_data2,class_label])
+                    val_features.append([shifting_data3,class_label])
+                    #val_features.append([addnoise_data,class_label])
                 print("val_features = ",len(val_features))
                 print("")
             else:
                 features.append([data,class_label])
                 if label!=2:
-                    features.append([stretching_data,label])
-                    features.append([shifting_data,label])
-                    features.append([addnoise_data,label])
+                    features.append([stretching_data,class_label])
+                    features.append([shifting_data1,class_label])
+                    features.append([shifting_data2,class_label])
+                    features.append([shifting_data3,class_label])
+                    #features.append([addnoise_data,class_label])
                 print("features = ",len(features))
                 print("")
             
@@ -273,12 +313,13 @@ def generate_usermade_dataset(class_type:str,file_type:str):
             print(i*0.1,":",1-(i*0.1)," ratio shifting")
             shifting_data = make_mfccs(audio_file,'shifting',term_ratio=i*0.1)
             features.append([shifting_data,class_label])
+            print("features = ",len(features))
         #data augmentation3(addnoise)
-        addnoise_data = make_mfccs(audio_file,'addnoise')
+        #addnoise_data = make_mfccs(audio_file,'addnoise')
         
         features.append([trim_data,class_label])
         features.append([stretching_data,class_label])
-        features.append([addnoise_data,class_label])
+        #features.append([addnoise_data,class_label])
         
     feature_df = pd.DataFrame(features,columns = ['mfccs','class_label'])
         
