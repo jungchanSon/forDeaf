@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:gravity="center">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:id="@+id/welcome_page_second"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -29,12 +28,14 @@
         <TextView
             android:id="@+id/text2"
             android:layout_width="350dp"
-            android:layout_height="200dp"
+            android:layout_height="316dp"
             android:layout_marginTop="50dp"
             android:background="@drawable/round_box"
             android:gravity="center"
             android:lineSpacingExtra="10dp"
-            android:text="@string/how_to_use"
+            android:text="사용안내 \n1. 제품을 가지고 있으면, 블루투스 \n설정창에서 페어링을 진행해 주세요.\n
+    2. 어플의 모든 권한을 수락해주세요.\n
+    3. 어플 실행을 유지하고, 진동을 전달 받을 수 있게 휴대해주세요."
             android:textColor="@color/textColor"
             android:textSize="20dp"></TextView>
     </LinearLayout>

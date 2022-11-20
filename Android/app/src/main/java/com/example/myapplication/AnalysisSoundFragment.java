@@ -53,18 +53,16 @@ public class AnalysisSoundFragment extends Fragment{
 
     private int audioDuration = 1000;
     private boolean isRecord = true;
-    String model_path = "model.tflite";
+    String model_path = "11_16_3.tflite";
 
     private double threshhold_low = 0.4;
     private double threshhold_high = 0.9;
 
-    private String[] labels_test = {
-            "car_horn",
-            "siren",
-            "Other"
+    private String[] labels = {
+            "자동차 경적 ",
+            "사이렌 ",
+            "그 외 "
     };
-
-
 
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
@@ -497,8 +495,9 @@ public class AnalysisSoundFragment extends Fragment{
 
 
                             binding.testText.setText(
-                                    output[0].length+labels_test[0]+": "+round(output[0][0], 3)+"\n" + labels_test[1]+"   : "+round(output[0][1], 3) +"\n" +
-                                    labels_test[2]+": "+round(output[0][2], 3)
+                                    labels[0]+": "+round(output[0][0], 2)*100+"%\n"
+                                    +labels[1]+": "+round(output[0][1], 2)*100+"%\n" +
+                                    labels[2]+": "+round(output[0][2], 2)*100+"%\n"
                             );
 
                             //test용
@@ -513,7 +512,7 @@ public class AnalysisSoundFragment extends Fragment{
                             }
 
                             binding.textMostValueTest.setText(
-                                    labels_test[maxI]+"\n" + round(maxV, 3)
+                                    labels[maxI]+"\n" + round(maxV, 2)*100+"%"
                             );
 
                             new File(audioFileName).delete();

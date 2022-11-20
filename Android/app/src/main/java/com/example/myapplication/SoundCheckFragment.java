@@ -19,6 +19,15 @@ public class SoundCheckFragment extends Fragment {
     private SoundCheckPageBinding binding;
     private int recordPermission;
     private int vibPermission;
+    private int READ_EXTERNAL_STORAGE;
+    private int WRITE_EXTERNAL_STORAGE;
+    private int BLUETOOTH_CONNECT;
+    private int BLUETOOTH_ADMIN;
+    private int ACCESS_FINE_LOCATION;
+    private int ACCESS_COARSE_LOCATION;
+    private int ACCESS_BACKGROUND_LOCATION;
+    private int BLUETOOTH;
+
 
     @Override
     public View onCreateView(
@@ -29,6 +38,7 @@ public class SoundCheckFragment extends Fragment {
 
         return binding.getRoot();
     }
+
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -49,35 +59,66 @@ public class SoundCheckFragment extends Fragment {
             }
         });
 
-
         //test 마이크 체크, 연결, 연결해제
         //권한 X
         recordPermission = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.RECORD_AUDIO);
         vibPermission = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.VIBRATE);
+        READ_EXTERNAL_STORAGE = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        WRITE_EXTERNAL_STORAGE = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        BLUETOOTH = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH);
+        BLUETOOTH_CONNECT = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH_CONNECT);
+        BLUETOOTH_ADMIN = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH_ADMIN);
+        ACCESS_FINE_LOCATION = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+        ACCESS_COARSE_LOCATION = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        ACCESS_BACKGROUND_LOCATION = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION);
 
         if(recordPermission == PackageManager.PERMISSION_DENIED){
-            binding.checkText.setText("마이크 권한을 허락해주세요. ❌");
-
             requestPermissions(new String[] {Manifest.permission.RECORD_AUDIO}, 123);
-        } else {
-
-            binding.checkText.setText("마이크가 연결되었습니다. ✔");
         }
-
         if(vibPermission == PackageManager.PERMISSION_DENIED){
 
-            binding.checkText.setText(binding.checkText.getText() + "\n진동 권한을 허락해주세요. ❌");
             requestPermissions(new String[] {Manifest.permission.VIBRATE}, 123);
+        }
 
-            System.out.println("NO");
-        }else{
-            binding.checkText.setText(binding.checkText.getText() + "\n진동이 연결되었습니다. ✔");
-            System.out.println("YES");
+        if(READ_EXTERNAL_STORAGE == PackageManager.PERMISSION_DENIED){
+            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 123);
+        }
 
+        if(WRITE_EXTERNAL_STORAGE == PackageManager.PERMISSION_DENIED){
+            requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 123);
+        }
+
+        if(BLUETOOTH == PackageManager.PERMISSION_DENIED){
+            requestPermissions(new String[] {Manifest.permission.BLUETOOTH}, 123);
+        }
+
+        if(BLUETOOTH_CONNECT == PackageManager.PERMISSION_DENIED){
+
+            requestPermissions(new String[] {Manifest.permission.BLUETOOTH_CONNECT}, 123);
+        }
+
+        if(BLUETOOTH_ADMIN == PackageManager.PERMISSION_DENIED){
+            requestPermissions(new String[] {Manifest.permission.BLUETOOTH_ADMIN}, 123);
+        }
+
+        if(ACCESS_FINE_LOCATION == PackageManager.PERMISSION_DENIED){
+
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+        }
+
+        if(ACCESS_COARSE_LOCATION == PackageManager.PERMISSION_DENIED){
+
+            requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
+        }
+
+        if(ACCESS_BACKGROUND_LOCATION == PackageManager.PERMISSION_DENIED){
+
+            requestPermissions(new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 123);
         }
 
         binding.checkingMic.setVisibility(View.GONE);
         binding.connectedMic.setVisibility(View.VISIBLE);
+        binding.checkText.setText("만약 권한 수락 팝업이 나오지 않는다면, 어플리케이션 설정창에 들어가서 권한을 수락해주세요.");
     }
 
 
